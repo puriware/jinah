@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/expenses.dart';
 import '../widgets/new_expenses.dart';
 
 class DataItem extends StatelessWidget {
+  final currency = NumberFormat("#,##0.00", "en_US");
   final String id;
   final String purpose;
-  final String amount;
+  final double amount;
   final int index;
-  const DataItem(
+  DataItem(
     this.id,
     this.purpose,
     this.amount,
@@ -20,8 +22,11 @@ class DataItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     return ListTile(
-      title: Text(purpose),
-      subtitle: Text(amount),
+      title: Text(
+        'Rp ${currency.format(amount)}',
+        style: Theme.of(context).textTheme.headline6,
+      ),
+      subtitle: Text(purpose),
       leading: CircleAvatar(
         // Theme.of(context).accentColor,
         radius: 30,

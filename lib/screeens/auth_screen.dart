@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/http_exception.dart';
@@ -23,8 +21,8 @@ class AuthScreen extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color.fromRGBO(215, 117, 255, 1).withOpacity(0.5),
-                  Color.fromRGBO(255, 188, 117, 1).withOpacity(0.9),
+                  Color.fromRGBO(170, 255, 169, 1).withOpacity(0.5),
+                  Color.fromRGBO(17, 255, 189, 1).withOpacity(0.9),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -161,16 +159,18 @@ class _AuthCardState extends State<AuthCard> {
       } else if (error.toString().contains('INVALID_PASSWORD')) {
         errorMessage = 'Invalid password';
       }
+      setState(() {
+        _isLoading = false;
+      });
       _showErrorDialog(errorMessage);
     } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
       const errorMessage =
           'Could not authenticate you. Please try again later.';
       _showErrorDialog(errorMessage);
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _switchAuthMode() {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:puri_expenses/models/user.dart';
+import 'package:puri_expenses/providers/user_active.dart';
 import '../constants.dart';
 import '../providers/auth.dart';
 import '../providers/expenses.dart';
@@ -18,6 +20,14 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: Auth()),
+        ChangeNotifierProxyProvider<Auth, UserActive>(
+          create: (_) => UserActive(null),
+          update: (ctx, auth, previousUserData) => UserActive(
+            previousUserData == null ? null : previousUserData.userActive,
+            authToken: auth.token,
+            userId: auth.userId,
+          ),
+        ),
         ChangeNotifierProxyProvider<Auth, Expenses>(
           create: (_) => Expenses([]),
           update: (ctx, auth, previousExpenses) => Expenses(
@@ -25,7 +35,7 @@ class MyApp extends StatelessWidget {
             authToken: auth.token,
             userId: auth.userId,
           ),
-        )
+        ),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(

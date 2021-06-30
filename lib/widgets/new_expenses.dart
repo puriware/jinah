@@ -1,4 +1,5 @@
 import 'package:provider/provider.dart';
+import 'package:puri_expenses/constants.dart';
 import '../models/expenses_item.dart';
 import '../providers/expenses.dart';
 
@@ -8,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class NewExpenses extends StatefulWidget {
-  String? expensesId;
+  final String? expensesId;
   NewExpenses({this.expensesId});
   static const routeName = '/new-expenses';
   @override
@@ -18,13 +19,14 @@ class NewExpenses extends StatefulWidget {
 class _NewExpensesState extends State<NewExpenses> {
   final _purposeController = TextEditingController();
   final _amountController = TextEditingController();
-  DateTime? _selectedDate;
+  final _dateController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
   var _editedExpensesItem = ExpensesItem(
     id: null,
+    userId: null,
     trxDate: null,
     purpose: '',
     amount: 0.0,
-    userId: '',
     created: DateTime.now(),
     updated: DateTime.now(),
   );
@@ -45,6 +47,7 @@ class _NewExpensesState extends State<NewExpenses> {
               DateTime.parse(_editedExpensesItem.trxDate.toString());
         });
       }
+      _dateController.text = DateFormat('dd MMMM yyyy').format(_selectedDate);
     }
     _isInit = false;
     super.didChangeDependencies();
@@ -65,10 +68,10 @@ class _NewExpensesState extends State<NewExpenses> {
     if (_editedExpensesItem.id != null) {
       _editedExpensesItem = ExpensesItem(
         id: _editedExpensesItem.id,
-        trxDate: DateFormat('yyyy-MM-dd').format(_selectedDate!),
+        userId: _editedExpensesItem.userId,
+        trxDate: DateFormat('yyyy-MM-dd').format(_selectedDate),
         purpose: enteredPurpose,
         amount: enteredAmount,
-        userId: _editedExpensesItem.userId,
         created: _editedExpensesItem.created,
         updated: DateTime.now(),
       );
@@ -77,10 +80,10 @@ class _NewExpensesState extends State<NewExpenses> {
     } else {
       _editedExpensesItem = ExpensesItem(
         id: null,
-        trxDate: DateFormat('yyyy-MM-dd').format(_selectedDate!),
+        userId: null,
+        trxDate: DateFormat('yyyy-MM-dd').format(_selectedDate),
         purpose: enteredPurpose,
         amount: enteredAmount,
-        userId: '',
         created: DateTime.now(),
         updated: DateTime.now(),
       );
@@ -112,7 +115,7 @@ class _NewExpensesState extends State<NewExpenses> {
     Navigator.of(context).pop();
   }
 
-  void _presentDatePicker() {
+  void _showDatePicker() {
     showDatePicker(
       context: context,
       initialDate: _editedExpensesItem.trxDate != null &&
@@ -127,6 +130,7 @@ class _NewExpensesState extends State<NewExpenses> {
       }
       setState(() {
         _selectedDate = pickedDate;
+        _dateController.text = DateFormat('dd MMMM yyyy').format(_selectedDate);
       });
     });
   }
@@ -136,58 +140,89 @@ class _NewExpensesState extends State<NewExpenses> {
     return _isLoading
         ? CircularProgressIndicator()
         : SingleChildScrollView(
-            child: Card(
-              elevation: 5,
-              child: Container(
-                padding: EdgeInsets.only(
-                    left: 10,
-                    top: 10,
-                    right: 10,
-                    bottom: MediaQuery.of(context).viewInsets.bottom + 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Title',
-                      ),
-                      controller: _purposeController,
-                    ),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Amount',
-                      ),
-                      controller: _amountController,
-                      keyboardType: TextInputType.number,
-                      onSubmitted: (_) => _submitData(),
-                    ),
-                    Container(
-                      height: 70,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _selectedDate == null
-                                  ? 'No Date Choosen!'
-                                  : DateFormat('dd MMMM yyyy')
-                                      .format(_selectedDate!),
-                            ),
-                          ),
-                          AdaptiveFlatButton('Choose Date', _presentDatePicker),
-                        ],
-                      ),
-                    ),
-                    TextButton(
-                      child: Text(
-                        'Save Expenses',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                top: 16,
+                left: 16,
+                right: 16,
+              ),
+              decoration: BoxDecoration(
+                  //color: kBackgroundColorDarker,
+                  ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(120.0, 0.0, 120.0, 8.0),
+                    child: Container(
+                      height: 8.0,
+                      width: 8.0,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        borderRadius: BorderRadius.all(
+                          const Radius.circular(8.0),
                         ),
                       ),
-                      onPressed: _submitData,
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(
+                    height: large,
+                  ),
+                  Center(
+                    child: Text(
+                      'New Transaction',
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
+                  ),
+                  SizedBox(
+                    height: large,
+                  ),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Title',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.title_rounded),
+                    ),
+                    controller: _purposeController,
+                  ),
+                  SizedBox(
+                    height: large,
+                  ),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Amount',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.price_change_rounded),
+                    ),
+                    controller: _amountController,
+                    keyboardType: TextInputType.number,
+                    onSubmitted: (_) => _submitData(),
+                  ),
+                  SizedBox(
+                    height: large,
+                  ),
+                  TextFormField(
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      labelText: 'Transaction Date',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.date_range_rounded),
+                    ),
+                    controller: _dateController,
+                    onTap: _showDatePicker,
+                    onFieldSubmitted: (_) => _submitData(),
+                  ),
+                  SizedBox(
+                    height: large,
+                  ),
+                  AdaptiveFlatButton(
+                    'Save Expenses',
+                    () => _submitData(),
+                  ),
+                ],
               ),
             ),
           );

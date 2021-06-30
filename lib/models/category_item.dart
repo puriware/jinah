@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 
-class ExpensesItem {
+class CategoryItem {
   final String? id;
   final String? userId;
-  final String? trxDate;
-  final String? purpose;
-  final double? amount;
+  final String? name;
+  final String? description;
   final DateTime? created;
   final DateTime? updated;
 
-  ExpensesItem({
+  CategoryItem({
     @required this.id,
     @required this.userId,
-    @required this.trxDate,
-    @required this.purpose,
-    @required this.amount,
+    @required this.name,
+    @required this.description,
     @required this.created,
     @required this.updated,
   });

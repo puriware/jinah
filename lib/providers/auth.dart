@@ -51,7 +51,6 @@ class Auth with ChangeNotifier {
           },
         ),
       );
-      //print(jsonDecode(response.body));
       final responseData = jsonDecode(response.body);
       if (responseData['error'] != null) {
         throw HttpException(responseData['error']['message']);
@@ -76,7 +75,7 @@ class Auth with ChangeNotifier {
           'expiryDate': _expiryDate!.toIso8601String()
         },
       );
-      prefs.setString(
+      await prefs.setString(
         'userData',
         userData,
       );
@@ -99,8 +98,9 @@ class Auth with ChangeNotifier {
       return false;
     }
 
-    final extractedUserData = jsonDecode(prefs.getString('userData').toString())
-        as Map<String, Object>;
+    final extractedUserData =
+        jsonDecode(prefs.getString('userData').toString());
+    //as Map<String, Object>;
     final expiryDate =
         DateTime.parse(extractedUserData['expiryDate'].toString());
 
@@ -136,9 +136,10 @@ class Auth with ChangeNotifier {
     }
     final timeToExpiry = _expiryDate!.difference(DateTime.now()).inSeconds;
     _authTimer = Timer(
-        Duration(
-          seconds: timeToExpiry,
-        ),
-        logOut);
+      Duration(
+        seconds: timeToExpiry,
+      ),
+      logOut,
+    );
   }
 }

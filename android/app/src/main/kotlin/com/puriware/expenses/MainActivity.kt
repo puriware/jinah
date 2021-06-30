@@ -1,4 +1,4 @@
-package com.example.puri_expenses
+package com.puriware.expenses
 
 import io.flutter.embedding.android.FlutterActivity
 
