@@ -22,7 +22,7 @@ class UserActive with ChangeNotifier {
     if (authToken != null) {
       var url = Uri.https(
         apiDB,
-        '/users/$userId.json',
+        '/users.json',
         {
           'auth': authToken,
           'orderBy': '"userId"',
@@ -40,7 +40,7 @@ class UserActive with ChangeNotifier {
           loadedUsers.add(
             User(
               id: userID,
-              userId: userData['userId'],
+              userId: userId,
               firstName: userData['firstName'],
               lastName: userData['lastName'],
               limit: userData['limit'],

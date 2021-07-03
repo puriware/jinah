@@ -1,14 +1,25 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import 'package:puri_expenses/providers/categories.dart';
+import 'package:puri_expenses/providers/expenses.dart';
+import 'package:puri_expenses/providers/user_active.dart';
+import 'package:puri_expenses/screeens/category_screen.dart';
 import 'package:puri_expenses/screeens/edit_user_screen.dart';
-import 'package:puri_expenses/screeens/expense_this_month_screen.dart';
+import 'package:puri_expenses/screeens/expenses_this_month_screen.dart';
 import 'package:puri_expenses/screeens/expenses_summary.dart';
 import 'package:puri_expenses/screeens/user_screen.dart';
 import '../screeens/expenses_list_screen.dart';
 import '../widgets/new_expenses.dart';
 
+enum OptionMenus {
+  Categories,
+  EditProfile,
+}
+
 class HomeScreen extends StatefulWidget {
+  static const routeName = '/';
   HomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -16,6 +27,36 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  var _isInit = true;
+  var _isLoading = false;
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    if (_isInit == true) {
+      setState(() {
+        _isLoading = true;
+      });
+      await Provider.of<Categories>(
+        context,
+        listen: false,
+      ).fetchAndSetCategories();
+      await Provider.of<UserActive>(
+        context,
+        listen: false,
+      ).fetchAndSetUser();
+      await Provider.of<Expenses>(
+        context,
+        listen: false,
+      ).fetchAndSetExpenses();
+      setState(() {
+        _isLoading = false;
+      });
+
+      _isInit = false;
+    }
+  }
+
   List<Map<String, Widget>> _pages = [
     {
       'page': ExpensesListScreen(),
@@ -40,6 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _startEditUserData(BuildContext ctx) {
     showModalBottomSheet(
+      isScrollControlled: true,
       context: ctx,
       builder: (_) {
         return GestureDetector(
@@ -53,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _startAddNewTransaction(BuildContext ctx) {
     showModalBottomSheet(
+      isScrollControlled: true,
       context: ctx,
       builder: (_) {
         return GestureDetector(
@@ -84,15 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               : null,
           actions: [
-            // IconButton(
-            //   tooltip: 'Search Expenses',
-            //   onPressed: () {},
-            //   icon: Icon(
-            //     defaultTargetPlatform == TargetPlatform.iOS
-            //         ? CupertinoIcons.search
-            //         : Icons.search,
-            //   ),
-            // ),
             if (_selectedPageIndex == 0)
               IconButton(
                 tooltip: 'Add new Expenses',
@@ -106,25 +140,40 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             if (_selectedPageIndex == 2)
-              IconButton(
-                tooltip: 'Edit user data',
-                onPressed: () {
-                  _startEditUserData(context);
+              PopupMenuButton(
+                onSelected: (OptionMenus selectedValue) {
+                  if (selectedValue == OptionMenus.Categories) {
+                    Navigator.of(context).pushNamed(CategoryScreen.routeName);
+                  } else if (selectedValue == OptionMenus.EditProfile) {
+                    _startEditUserData(context);
+                  }
                 },
                 icon: Icon(
-                  defaultTargetPlatform == TargetPlatform.iOS
-                      ? CupertinoIcons.pencil
-                      : Icons.edit,
+                  Icons.more_vert,
                 ),
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    child: Text('Edit Profile'),
+                    value: OptionMenus.EditProfile,
+                  ),
+                  PopupMenuItem(
+                    child: Text('Show Categories'),
+                    value: OptionMenus.Categories,
+                  ),
+                ],
+              )
+          ],
+        ),
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : TabBarView(
+                children: [
+                  _pages[_selectedPageIndex]['page']!,
+                  if (_selectedPageIndex == 0) ExpensesThisMonthScreen()
+                ],
               ),
-          ],
-        ),
-        body: TabBarView(
-          children: [
-            _pages[_selectedPageIndex]['page']!,
-            if (_selectedPageIndex == 0) ExpensesThisMonthScreen()
-          ],
-        ),
         bottomNavigationBar: BottomNavigationBar(
           onTap: _selectPage,
           currentIndex: _selectedPageIndex,

@@ -14,8 +14,13 @@ class Categories with ChangeNotifier {
   final String? userId;
 
   Categories(this._items, {this.authToken, this.userId});
+
   List<CategoryItem> get items {
     return [..._items];
+  }
+
+  String categoryName(String id) {
+    return _items.firstWhere((cat) => cat.id == id).name.toString();
   }
 
   Future<void> fetchAndSetCategories() async {
@@ -51,6 +56,7 @@ class Categories with ChangeNotifier {
           );
         });
         _items = loadedCategories;
+        if (_items.length <= 0) initData();
         notifyListeners();
       }
     }
@@ -156,5 +162,28 @@ class Categories with ChangeNotifier {
 
   CategoryItem findById(String id) {
     return _items.firstWhere((prod) => prod.id == id);
+  }
+
+  void initData() async {
+    var uncategorized = CategoryItem(
+      id: null,
+      userId: userId,
+      name: 'Uncategorized',
+      description: 'for data without categories',
+      created: DateTime.now(),
+      updated: DateTime.now(),
+    );
+
+    var foodAndDrink = CategoryItem(
+      id: null,
+      userId: userId,
+      name: 'Food & Drink',
+      description: 'for data food and drink',
+      created: DateTime.now(),
+      updated: DateTime.now(),
+    );
+
+    await addCategoryItem(uncategorized);
+    await addCategoryItem(foodAndDrink);
   }
 }

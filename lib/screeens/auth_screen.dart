@@ -104,6 +104,7 @@ class _AuthCardState extends State<AuthCard> {
   };
   var _isLoading = false;
   final _passwordController = TextEditingController();
+  var _isChecked = false;
 
   void _showErrorDialog(String message) {
     showDialog(

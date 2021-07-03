@@ -99,7 +99,19 @@ class _EditUserScreenState extends State<EditUserScreen> {
     return SingleChildScrollView(
       child: Container(
         margin: EdgeInsets.all(large),
+        width: double.infinity,
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          top: 16,
+          left: 16,
+          right: 16,
+        ),
+        decoration: BoxDecoration(
+            //color: kBackgroundColorDarker,
+            ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.max,
           children: [
             CircleAvatar(
               child: Icon(Icons.person),
@@ -118,6 +130,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
                       prefixIcon: Icon(Icons.title_rounded),
                     ),
                     controller: _firstNameController,
+                    textInputAction: TextInputAction.next,
                   ),
                 ),
                 SizedBox(
@@ -132,6 +145,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
                       prefixIcon: Icon(Icons.title_rounded),
                     ),
                     controller: _lastNameController,
+                    textInputAction: TextInputAction.next,
                   ),
                 ),
               ],
@@ -147,6 +161,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
               ),
               controller: _limitController,
               keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.done,
               onSubmitted: (_) => _submitData(),
             ),
             SizedBox(
@@ -155,6 +170,8 @@ class _EditUserScreenState extends State<EditUserScreen> {
             AdaptiveFlatButton(
               'Save',
               () => _submitData(),
+              null,
+              Icon(Icons.save),
             ),
           ],
         ),

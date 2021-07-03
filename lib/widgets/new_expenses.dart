@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:puri_expenses/constants.dart';
+import 'package:puri_expenses/models/category_item.dart';
+import 'package:puri_expenses/providers/categories.dart';
 import '../models/expenses_item.dart';
 import '../providers/expenses.dart';
 
@@ -20,13 +23,18 @@ class _NewExpensesState extends State<NewExpenses> {
   final _purposeController = TextEditingController();
   final _amountController = TextEditingController();
   final _dateController = TextEditingController();
+  String _categoryValue = '';
+  List<DropdownMenuItem<String>> _categoryItems = [];
+  List<CategoryItem> _dataCategory = [];
   DateTime _selectedDate = DateTime.now();
+
   var _editedExpensesItem = ExpensesItem(
     id: null,
     userId: null,
     trxDate: null,
     purpose: '',
     amount: 0.0,
+    category: '',
     created: DateTime.now(),
     updated: DateTime.now(),
   );
@@ -34,8 +42,16 @@ class _NewExpensesState extends State<NewExpenses> {
   var _isLoading = false;
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     if (_isInit) {
+      _dataCategory = Provider.of<Categories>(context, listen: false).items;
+      _categoryItems = _dataCategory
+          .map((e) => DropdownMenuItem(
+                child: Text(e.name!),
+                value: e.id,
+              ))
+          .toList();
+      _categoryValue = _dataCategory[0].id.toString();
       final String? expensesId = widget.expensesId;
       if (expensesId != null) {
         _editedExpensesItem =
@@ -46,6 +62,7 @@ class _NewExpensesState extends State<NewExpenses> {
           _selectedDate =
               DateTime.parse(_editedExpensesItem.trxDate.toString());
         });
+        _categoryValue = _editedExpensesItem.category.toString();
       }
       _dateController.text = DateFormat('dd MMMM yyyy').format(_selectedDate);
     }
@@ -72,6 +89,7 @@ class _NewExpensesState extends State<NewExpenses> {
         trxDate: DateFormat('yyyy-MM-dd').format(_selectedDate),
         purpose: enteredPurpose,
         amount: enteredAmount,
+        category: _categoryValue,
         created: _editedExpensesItem.created,
         updated: DateTime.now(),
       );
@@ -84,6 +102,7 @@ class _NewExpensesState extends State<NewExpenses> {
         trxDate: DateFormat('yyyy-MM-dd').format(_selectedDate),
         purpose: enteredPurpose,
         amount: enteredAmount,
+        category: _categoryValue,
         created: DateTime.now(),
         updated: DateTime.now(),
       );
@@ -180,6 +199,22 @@ class _NewExpensesState extends State<NewExpenses> {
                   SizedBox(
                     height: large,
                   ),
+                  DropdownButtonFormField<String>(
+                    value: _categoryValue,
+                    decoration: InputDecoration(
+                      labelText: 'Category',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.category),
+                    ),
+                    icon: Icon(Icons.arrow_drop_down_circle_rounded),
+                    items: _categoryItems,
+                    onChanged: (value) {
+                      _categoryValue = value!;
+                    },
+                  ),
+                  SizedBox(
+                    height: large,
+                  ),
                   TextField(
                     decoration: InputDecoration(
                       labelText: 'Title',
@@ -187,6 +222,7 @@ class _NewExpensesState extends State<NewExpenses> {
                       prefixIcon: Icon(Icons.title_rounded),
                     ),
                     controller: _purposeController,
+                    textInputAction: TextInputAction.next,
                   ),
                   SizedBox(
                     height: large,
@@ -218,10 +254,8 @@ class _NewExpensesState extends State<NewExpenses> {
                   SizedBox(
                     height: large,
                   ),
-                  AdaptiveFlatButton(
-                    'Save Expenses',
-                    () => _submitData(),
-                  ),
+                  AdaptiveFlatButton('Save Expenses', () => _submitData(), null,
+                      Icon(Icons.save)),
                 ],
               ),
             ),

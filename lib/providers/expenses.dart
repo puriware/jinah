@@ -32,6 +32,32 @@ class Expenses with ChangeNotifier {
         .toList();
   }
 
+  double get expensesBeforeTodays {
+    var result = thisMoth
+        .where((item) =>
+            DateTime.parse(item.trxDate.toString()).weekday <
+            DateTime.now().weekday)
+        .toList();
+    var total = 0.0;
+    result.forEach((exp) {
+      total += exp.amount!;
+    });
+    return total;
+  }
+
+  double get todayExpenses {
+    var result = todays
+        .where((item) =>
+            DateTime.parse(item.trxDate.toString()).weekday ==
+            DateTime.now().weekday)
+        .toList();
+    var total = 0.0;
+    result.forEach((exp) {
+      total += exp.amount!;
+    });
+    return total;
+  }
+
   List<ExpensesItem> get thisMoth {
     return _items
         .where(
@@ -70,6 +96,7 @@ class Expenses with ChangeNotifier {
               trxDate: expensesData['trxDate'],
               purpose: expensesData['purpose'],
               amount: expensesData['amount'],
+              category: expensesData['category'],
               created: DateTime.parse(expensesData['created'].toString()),
               updated: DateTime.parse(expensesData['updated'].toString()),
             ),
@@ -98,6 +125,7 @@ class Expenses with ChangeNotifier {
             'trxDate': expensesItem.trxDate,
             'purpose': expensesItem.purpose,
             'amount': expensesItem.amount,
+            'category': expensesItem.category,
             'created': expensesItem.created != null
                 ? expensesItem.created!.toIso8601String()
                 : DateTime.now().toIso8601String(),
@@ -114,6 +142,7 @@ class Expenses with ChangeNotifier {
         trxDate: expensesItem.trxDate,
         purpose: expensesItem.purpose,
         amount: expensesItem.amount,
+        category: expensesItem.category,
         created: expensesItem.created != null
             ? expensesItem.created!
             : DateTime.now(),
@@ -147,6 +176,7 @@ class Expenses with ChangeNotifier {
               'trxDate': newExpensesItem.trxDate,
               'purpose': newExpensesItem.purpose,
               'amount': newExpensesItem.amount,
+              'category': newExpensesItem.category,
               'updated': DateTime.now().toIso8601String(),
             },
           ),
@@ -186,5 +216,12 @@ class Expenses with ChangeNotifier {
 
   ExpensesItem findById(String id) {
     return _items.firstWhere((prod) => prod.id == id);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    print('dispose');
   }
 }

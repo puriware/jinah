@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:puri_expenses/models/category_item.dart';
 
 class ExpensesItem {
   final String? id;
@@ -6,6 +7,7 @@ class ExpensesItem {
   final String? trxDate;
   final String? purpose;
   final double? amount;
+  final String? category;
   final DateTime? created;
   final DateTime? updated;
 
@@ -15,6 +17,7 @@ class ExpensesItem {
     @required this.trxDate,
     @required this.purpose,
     @required this.amount,
+    @required this.category,
     @required this.created,
     @required this.updated,
   });
