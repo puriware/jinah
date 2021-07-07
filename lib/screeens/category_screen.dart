@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:puri_expenses/providers/categories.dart';
+import 'package:puri_expenses/widgets/message_dialog.dart';
 import 'package:puri_expenses/widgets/new_category.dart';
 
 import '../constants.dart';
@@ -20,6 +21,7 @@ class CategoryScreen extends StatelessWidget {
             onPressed: () {
               showModalBottomSheet(
                 context: context,
+                isScrollControlled: true,
                 builder: (_) {
                   return GestureDetector(
                     onTap: () {},
@@ -61,6 +63,50 @@ class CategoryScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+                      onLongPress: () {
+                        MessageDialog.showMessageDialog(
+                          context,
+                          'Delete Category',
+                          'Are you sure to delete category data?',
+                          'Delete',
+                          () async {
+                            try {
+                              await Provider.of<Categories>(context,
+                                      listen: false)
+                                  .deleteCategoryItem(category.id!);
+                            } catch (error) {
+                              MessageDialog.showPopUpMessage(
+                                context,
+                                'Delete Category',
+                                'Failed to delete data category!',
+                              );
+                            }
+                          },
+                        );
+                      },
+                      onTap: () {
+                        MessageDialog.showMessageDialog(
+                          context,
+                          'Edit Category',
+                          'Are you sure to edit category data?',
+                          'Yes',
+                          () async {
+                            await showModalBottomSheet(
+                              isScrollControlled: true,
+                              context: ctx,
+                              builder: (_) {
+                                return GestureDetector(
+                                  onTap: () {},
+                                  child: NewCategory(
+                                    categoryId: category.id,
+                                  ),
+                                  behavior: HitTestBehavior.opaque,
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
                     ),
                     if (idx < dataCategories.length - 1)
                       Divider(

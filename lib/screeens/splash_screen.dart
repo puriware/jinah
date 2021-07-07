@@ -23,26 +23,25 @@ class SplashScreen extends StatelessWidget {
               ),
             ),
           ),
-          SingleChildScrollView(
+          Container(
+            padding: EdgeInsets.only(bottom: large),
+            height: deviceSize.height,
+            width: deviceSize.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: deviceSize.width * 0.60,
+                  child: Image.asset('assets/images/puriware-long-white.png'),
+                ),
+              ],
+            ),
+          ),
+          Center(
             child: Container(
-              height: deviceSize.height,
-              width: deviceSize.width,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Spacer(),
-                  Container(
-                    width: deviceSize.width * 0.5,
-                    child: Image.asset('assets/logos/jinah.png'),
-                  ),
-                  Spacer(),
-                  // Container(
-                  //   width: deviceSize.width * 0.60,
-                  //   child: Image.asset('assets/logos/puriware.png'),
-                  // ),
-                ],
-              ),
+              width: deviceSize.width * 0.5,
+              child: Image.asset('assets/logos/jinah.png'),
             ),
           ),
         ],

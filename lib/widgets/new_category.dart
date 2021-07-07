@@ -1,12 +1,11 @@
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/constants.dart';
+import '../../constants.dart';
 import '../models/category_item.dart';
 import '../providers/categories.dart';
 
 import './adaptive_flat_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class NewCategory extends StatefulWidget {
   final String? categoryId;
@@ -168,7 +167,7 @@ class _NewCategoryState extends State<NewCategory> {
                       prefixIcon: Icon(Icons.text_fields_rounded),
                     ),
                     controller: _descriptionController,
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.text,
                     onSubmitted: (_) => _submitData(),
                   ),
                   SizedBox(

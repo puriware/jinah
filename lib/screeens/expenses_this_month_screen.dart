@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import "package:collection/collection.dart";
+import 'package:grouped_list/grouped_list.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/widgets/summary_item.dart';
+import 'package:puri_expenses/constants.dart';
+import 'package:puri_expenses/providers/categories.dart';
 import '../../models/expenses_item.dart';
 import '../../providers/expenses.dart';
 
@@ -17,9 +20,10 @@ class _ExpensesThisMonthScreenState extends State<ExpensesThisMonthScreen> {
   List<ExpensesItem> _expensesData = [];
   Map<String, List<ExpensesItem>> _dailyData = {};
   List<String> _keys = [];
+  final currency = NumberFormat("#,##0.00", "en_US");
 
   Future<void> _refreshEexpenses(BuildContext ctx) async {
-    _expensesData = Provider.of<Expenses>(ctx, listen: false).thisMoth;
+    _expensesData = Provider.of<Expenses>(ctx, listen: false).thisMonth;
     if (_expensesData.isNotEmpty) {
       _dailyData = groupBy(
         _expensesData,
@@ -48,14 +52,70 @@ class _ExpensesThisMonthScreenState extends State<ExpensesThisMonthScreen> {
                 )
               : RefreshIndicator(
                   onRefresh: () => _refreshEexpenses(context),
-                  child: ListView.builder(
-                    itemBuilder: (ctx, idx) {
-                      final date = _keys.elementAt(idx);
-                      final total = _sumWeight(_dailyData[date]!);
-                      return SummaryItem(date, total, _dailyData[date]!);
-                    },
-                    itemCount: _keys.length,
+                  child: GroupedListView<ExpensesItem, String>(
+                    elements: _expensesData,
+                    groupBy: (exp) => exp.trxDate!,
+                    //separator: Divider(),
+                    order: GroupedListOrder.DESC,
+                    groupSeparatorBuilder: (String groupValue) => Center(
+                      child: Column(
+                        children: [
+                          Divider(),
+                          Text(
+                            groupValue,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          Divider(),
+                        ],
+                      ),
+                    ),
+                    indexedItemBuilder: (ctx, expense, idx) => ListTile(
+                      title: Text(
+                        Provider.of<Categories>(context, listen: false)
+                            .categoryName(
+                          expense.category.toString(),
+                        ),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: large,
+                        ),
+                      ),
+                      subtitle: Text(expense.purpose.toString()),
+                      leading: CircleAvatar(
+                        // Theme.of(context).accentColor,
+                        radius: 30,
+                        child: Padding(
+                          padding: EdgeInsets.all(2),
+                          child: FittedBox(
+                            child: Text(
+                              (_expensesData.length - idx).toString(),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                      trailing: Text(
+                        'Rp ${currency.format(expense.amount!)}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: large,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
                   ),
+                  // child: ListView.builder(
+                  //   itemBuilder: (ctx, idx) {
+                  //     final date = _keys.elementAt(idx);
+                  //     final total = _sumWeight(_dailyData[date]!);
+                  //     return SummaryItem(
+                  //         DateTime.parse(date), total, _dailyData[date]!);
+                  //   },
+                  //   itemCount: _keys.length,
+                  // ),
                 ),
     );
   }

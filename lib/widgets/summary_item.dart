@@ -1,78 +1,122 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'dart:math';
+import 'package:provider/provider.dart';
+import 'package:puri_expenses/constants.dart';
 
 import 'package:puri_expenses/models/expenses_item.dart';
-import 'package:puri_expenses/widgets/data_item.dart';
+import 'package:puri_expenses/providers/categories.dart';
 
-class SummaryItem extends StatefulWidget {
+class SummaryItem extends StatelessWidget {
   final currency = NumberFormat("#,##0.00", "en_US");
-  final String date;
+  final DateTime date;
   final double total;
   final List<ExpensesItem> expenses;
   SummaryItem(this.date, this.total, this.expenses, {Key? key})
       : super(key: key);
 
   @override
-  _SummaryItemState createState() => _SummaryItemState();
-}
-
-class _SummaryItemState extends State<SummaryItem> {
-  var _expanded = false;
-  @override
   Widget build(BuildContext context) {
+    var num = 1;
     return Card(
-      margin: EdgeInsets.only(
-        left: 10,
-        top: 10,
-        right: 10,
-      ),
       child: Column(
         children: [
           ListTile(
-            title: Text('Rp ${widget.currency.format(widget.total)}'),
+            leading: CircleAvatar(
+              child: FittedBox(
+                child: Text(
+                  DateFormat('dd').format(this.date),
+                ),
+              ),
+            ),
+            title: Text(DateFormat('EEEE').format(this.date)),
             subtitle: Text(
-              widget.date,
+              DateFormat('MMMM yyyy').format(this.date),
             ),
-            trailing: IconButton(
-              icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
-              onPressed: () {
-                setState(() {
-                  _expanded = !_expanded;
-                });
-              },
-            ),
+            trailing: Text('Rp ${this.currency.format(this.total)}'),
           ),
-          if (_expanded)
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 4,
-              ),
-              height: min(widget.expenses.length * 20 + 20.0, 100),
-              child: ListView.builder(
-                itemBuilder: (ctx, idx) {
-                  var expense = widget.expenses[idx];
-                  return Column(
-                    children: [
-                      DataItem(
-                        expense.id.toString(),
-                        expense.purpose.toString(),
-                        expense.amount!,
-                        idx,
-                      ),
-                      if (idx < widget.expenses.length - 1)
-                        Divider(
-                          thickness: 1,
-                          indent: 20,
-                          endIndent: 20,
+          Divider(),
+          ListView(
+            children: [
+              ...expenses
+                  .map(
+                    (expense) => ListTile(
+                      title: Text(
+                        Provider.of<Categories>(context, listen: false)
+                            .categoryName(
+                          expense.category.toString(),
                         ),
-                    ],
-                  );
-                },
-                itemCount: widget.expenses.length,
-              ),
-            )
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: large,
+                        ),
+                      ),
+                      subtitle: Text(expense.purpose.toString()),
+                      leading: CircleAvatar(
+                        // Theme.of(context).accentColor,
+                        radius: 30,
+                        child: Padding(
+                          padding: EdgeInsets.all(2),
+                          child: FittedBox(
+                            child: Text(
+                              (num).toString(),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                      trailing: Text(
+                        'Rp ${currency.format(expense.amount!)}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: large,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ],
+          ),
+          // ListView.builder(
+          //   itemBuilder: (ctx, idx) {
+          //     var expense = expenses[idx];
+          //     return ListTile(
+          //       title: Text(
+          //         Provider.of<Categories>(context, listen: false)
+          //             .categoryName(
+          //           expense.category.toString(),
+          //         ),
+          //         style: TextStyle(
+          //           fontWeight: FontWeight.bold,
+          //           fontSize: large,
+          //         ),
+          //       ),
+          //       subtitle: Text(expense.purpose.toString()),
+          //       leading: CircleAvatar(
+          //         // Theme.of(context).accentColor,
+          //         radius: 30,
+          //         child: Padding(
+          //           padding: EdgeInsets.all(2),
+          //           child: FittedBox(
+          //             child: Text(
+          //               (idx + 1).toString(),
+          //               style: TextStyle(color: Colors.white),
+          //             ),
+          //           ),
+          //         ),
+          //       ),
+          //       trailing: Text(
+          //         'Rp ${currency.format(expense.amount!)}',
+          //         style: TextStyle(
+          //           fontWeight: FontWeight.bold,
+          //           fontSize: large,
+          //           color: Colors.red,
+          //         ),
+          //       ),
+          //     );
+          //   },
+          //   itemCount: expenses.length,
+          // ),
         ],
       ),
     );

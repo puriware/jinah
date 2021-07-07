@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:puri_expenses/constants.dart';
 import '../models/http_exception.dart';
 import '../providers/auth.dart';
 
@@ -21,13 +22,28 @@ class AuthScreen extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color.fromRGBO(170, 255, 169, 1).withOpacity(0.5),
-                  Color.fromRGBO(17, 255, 189, 1).withOpacity(0.9),
+                  Color.fromRGBO(170, 255, 169, 1),
+                  Color.fromRGBO(17, 255, 189, 1),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 stops: [0, 1],
               ),
+            ),
+          ),
+          Container(
+            height: deviceSize.height,
+            width: deviceSize.width,
+            padding: EdgeInsets.only(bottom: large),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: deviceSize.width * 0.5,
+                  child: Image.asset('assets/images/puriware-long-white.png'),
+                ),
+              ],
             ),
           ),
           SingleChildScrollView(
@@ -104,7 +120,6 @@ class _AuthCardState extends State<AuthCard> {
   };
   var _isLoading = false;
   final _passwordController = TextEditingController();
-  var _isChecked = false;
 
   void _showErrorDialog(String message) {
     showDialog(

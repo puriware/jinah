@@ -33,10 +33,22 @@ class Expenses with ChangeNotifier {
   }
 
   double get expensesBeforeTodays {
-    var result = thisMoth
-        .where((item) =>
-            DateTime.parse(item.trxDate.toString()).weekday <
-            DateTime.now().weekday)
+    var result = thisMonth
+        .where(
+          (item) =>
+              int.parse(
+                DateFormat('D').format(
+                  DateTime.parse(
+                    item.trxDate.toString(),
+                  ),
+                ),
+              ) <
+              int.parse(
+                DateFormat('D').format(
+                  DateTime.now(),
+                ),
+              ),
+        )
         .toList();
     var total = 0.0;
     result.forEach((exp) {
@@ -47,9 +59,21 @@ class Expenses with ChangeNotifier {
 
   double get todayExpenses {
     var result = todays
-        .where((item) =>
-            DateTime.parse(item.trxDate.toString()).weekday ==
-            DateTime.now().weekday)
+        .where(
+          (item) =>
+              int.parse(
+                DateFormat('D').format(
+                  DateTime.parse(
+                    item.trxDate.toString(),
+                  ),
+                ),
+              ) ==
+              int.parse(
+                DateFormat('D').format(
+                  DateTime.now(),
+                ),
+              ),
+        )
         .toList();
     var total = 0.0;
     result.forEach((exp) {
@@ -58,7 +82,7 @@ class Expenses with ChangeNotifier {
     return total;
   }
 
-  List<ExpensesItem> get thisMoth {
+  List<ExpensesItem> get thisMonth {
     return _items
         .where(
           (item) =>

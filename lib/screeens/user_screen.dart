@@ -4,6 +4,7 @@ import 'package:puri_expenses/constants.dart';
 import 'package:puri_expenses/providers/auth.dart';
 import 'package:puri_expenses/providers/user_active.dart';
 import 'package:puri_expenses/widgets/adaptive_flat_button.dart';
+import 'package:puri_expenses/widgets/message_dialog.dart';
 
 class UserScreen extends StatelessWidget {
   const UserScreen({Key? key}) : super(key: key);
@@ -72,9 +73,18 @@ class UserScreen extends StatelessWidget {
                         ),
                         AdaptiveFlatButton(
                           'Logout',
-                          () {
-                            Navigator.of(context).pushReplacementNamed('/');
-                            Provider.of<Auth>(context, listen: false).logOut();
+                          () async {
+                            await MessageDialog.showMessageDialog(
+                              context,
+                              'Logout',
+                              'Are you sure you want to logout?',
+                              'Logout',
+                              () {
+                                Navigator.of(context).pushReplacementNamed('/');
+                                Provider.of<Auth>(context, listen: false)
+                                    .logOut();
+                              },
+                            );
                           },
                           Colors.red,
                           Icon(Icons.logout),

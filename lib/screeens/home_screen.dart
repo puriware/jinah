@@ -8,7 +8,7 @@ import 'package:puri_expenses/providers/user_active.dart';
 import 'package:puri_expenses/screeens/category_screen.dart';
 import 'package:puri_expenses/screeens/edit_user_screen.dart';
 import 'package:puri_expenses/screeens/expenses_this_month_screen.dart';
-import 'package:puri_expenses/screeens/expenses_summary.dart';
+import 'package:puri_expenses/screeens/expenses_summary_screen.dart';
 import 'package:puri_expenses/screeens/user_screen.dart';
 import '../screeens/expenses_list_screen.dart';
 import '../widgets/new_expenses.dart';
