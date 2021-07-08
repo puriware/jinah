@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/constants.dart';
-import 'package:puri_expenses/models/expenses_item.dart';
-import 'package:puri_expenses/providers/categories.dart';
-import 'package:puri_expenses/providers/expenses.dart';
-import 'package:puri_expenses/widgets/message_dialog.dart';
-import 'package:puri_expenses/widgets/new_expenses.dart';
+import '../../constants.dart';
+import '../../models/expenses_item.dart';
+import '../../providers/categories.dart';
+import '../../providers/expenses.dart';
+import '../../widgets/message_dialog.dart';
+import '../../widgets/new_expenses.dart';
 
 class ListExpenses extends StatelessWidget {
   final currency = NumberFormat("#,##0.00", "en_US");

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:puri_expenses/constants.dart';
-import 'package:puri_expenses/widgets/summary.dart';
+import '../../constants.dart';
+import '../../widgets/summary.dart';
 
 class DailySummary extends StatelessWidget {
   const DailySummary({

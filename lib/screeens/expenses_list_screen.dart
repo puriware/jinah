@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/constants.dart';
-import 'package:puri_expenses/providers/user_active.dart';
-import 'package:puri_expenses/widgets/daily_summary.dart';
-import 'package:puri_expenses/widgets/list_expenses.dart';
+import '../../constants.dart';
+import '../../providers/user_active.dart';
+import '../../widgets/daily_summary.dart';
+import '../../widgets/list_expenses.dart';
 import '../models/expenses_item.dart';
 import '../providers/expenses.dart';
 

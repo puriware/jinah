@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/providers/categories.dart';
-import 'package:puri_expenses/widgets/message_dialog.dart';
-import 'package:puri_expenses/widgets/new_category.dart';
+import '../../providers/categories.dart';
+import '../../widgets/message_dialog.dart';
+import '../../widgets/new_category.dart';
 
 import '../constants.dart';
 

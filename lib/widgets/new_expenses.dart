@@ -1,8 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/constants.dart';
-import 'package:puri_expenses/models/category_item.dart';
-import 'package:puri_expenses/providers/categories.dart';
+import '../../constants.dart';
+import '../../models/category_item.dart';
+import '../../providers/categories.dart';
 import '../models/expenses_item.dart';
 import '../providers/expenses.dart';
 

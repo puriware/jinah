@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/constants.dart';
+import '../../constants.dart';
 
-import 'package:puri_expenses/models/expenses_item.dart';
-import 'package:puri_expenses/providers/categories.dart';
+import '../../models/expenses_item.dart';
+import '../../providers/categories.dart';
 
 class SummaryItem extends StatelessWidget {
   final currency = NumberFormat("#,##0.00", "en_US");

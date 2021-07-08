@@ -3,8 +3,8 @@ import "package:collection/collection.dart";
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/constants.dart';
-import 'package:puri_expenses/providers/categories.dart';
+import '../../constants.dart';
+import '../../providers/categories.dart';
 import '../../models/expenses_item.dart';
 import '../../providers/expenses.dart';
 

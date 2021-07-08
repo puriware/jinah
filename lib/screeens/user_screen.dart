@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/constants.dart';
-import 'package:puri_expenses/providers/auth.dart';
-import 'package:puri_expenses/providers/user_active.dart';
-import 'package:puri_expenses/widgets/adaptive_flat_button.dart';
-import 'package:puri_expenses/widgets/message_dialog.dart';
+import '../../constants.dart';
+import '../../providers/auth.dart';
+import '../../providers/user_active.dart';
+import '../../widgets/adaptive_flat_button.dart';
+import '../../widgets/message_dialog.dart';
 
 class UserScreen extends StatelessWidget {
   const UserScreen({Key? key}) : super(key: key);

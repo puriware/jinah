@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:puri_expenses/models/category_item.dart';
 
 class ExpensesItem {
   final String? id;

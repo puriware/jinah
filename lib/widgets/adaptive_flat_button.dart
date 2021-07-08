@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:puri_expenses/constants.dart';
+import '../../constants.dart';
 
 class AdaptiveFlatButton extends StatelessWidget {
   final String text;

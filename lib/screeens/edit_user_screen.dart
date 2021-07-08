@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/constants.dart';
-import 'package:puri_expenses/models/user.dart';
-import 'package:puri_expenses/providers/user_active.dart';
-import 'package:puri_expenses/widgets/adaptive_flat_button.dart';
+import '../../constants.dart';
+import '../../models/user.dart';
+import '../../providers/user_active.dart';
+import '../../widgets/adaptive_flat_button.dart';
 
 class EditUserScreen extends StatefulWidget {
   const EditUserScreen({Key? key}) : super(key: key);
