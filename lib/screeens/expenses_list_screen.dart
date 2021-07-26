@@ -17,11 +17,21 @@ class ExpensesListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     List<ExpensesItem> _todays = Provider.of<Expenses>(
       context,
+      listen: false,
     ).todays;
-
-    final limit = Provider.of<UserActive>(context).userActive!.limit;
-    final beforeTodays = Provider.of<Expenses>(context).expensesBeforeTodays;
-    final todayExpenses = Provider.of<Expenses>(context).todayExpenses;
+    final user = Provider.of<UserActive>(
+      context,
+      listen: false,
+    ).userActive;
+    final limit = user != null && user.limit != null ? user.limit : 0.0;
+    final beforeTodays = Provider.of<Expenses>(
+      context,
+      listen: false,
+    ).expensesBeforeTodays;
+    final todayExpenses = Provider.of<Expenses>(
+      context,
+      listen: false,
+    ).todayExpenses;
     final limitLeft = limit != null
         ? limit - (beforeTodays + todayExpenses)
         : beforeTodays + todayExpenses;
