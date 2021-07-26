@@ -38,10 +38,14 @@ class Summary extends StatelessWidget {
             SizedBox(
               height: 4,
             ),
-            Text(
-              subTitle,
-              style: TextStyle(color: Colors.grey),
-              //textAlign: TextAlign.center,
+            FittedBox(
+              child: Text(
+                subTitle,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+                //textAlign: TextAlign.center,
+              ),
             ),
           ]),
       decoration: BoxDecoration(

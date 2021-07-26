@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:puri_expenses/widgets/message_dialog.dart';
 import '../../providers/categories.dart';
 import '../../providers/expenses.dart';
 import '../../providers/user_active.dart';
@@ -37,23 +38,32 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _isLoading = true;
       });
-      await Provider.of<Categories>(
-        context,
-        listen: false,
-      ).fetchAndSetCategories();
-      await Provider.of<UserActive>(
-        context,
-        listen: false,
-      ).fetchAndSetUser();
-      await Provider.of<Expenses>(
-        context,
-        listen: false,
-      ).fetchAndSetExpenses();
-      setState(() {
-        _isLoading = false;
-      });
-
-      _isInit = false;
+      try {
+        await Provider.of<Categories>(
+          context,
+          listen: false,
+        ).fetchAndSetCategories();
+        await Provider.of<UserActive>(
+          context,
+          listen: false,
+        ).fetchAndSetUser();
+        await Provider.of<Expenses>(
+          context,
+          listen: false,
+        ).fetchAndSetExpenses();
+        setState(() {
+          _isLoading = false;
+        });
+        _isInit = false;
+      } catch (error) {
+        if (mounted) {
+          MessageDialog.showPopUpMessage(
+            context,
+            "Error",
+            error.toString(),
+          );
+        }
+      }
     }
   }
 
@@ -127,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               : null,
           actions: [
-            if (_selectedPageIndex == 0)
+            if (_selectedPageIndex == 0) ...[
               IconButton(
                 tooltip: 'Add new Expenses',
                 onPressed: () {
@@ -139,7 +149,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       : Icons.add_rounded,
                 ),
               ),
-            if (_selectedPageIndex == 2)
               PopupMenuButton(
                 onSelected: (OptionMenus selectedValue) {
                   if (selectedValue == OptionMenus.Categories) {
@@ -153,15 +162,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 itemBuilder: (_) => [
                   PopupMenuItem(
-                    child: Text('Edit Profile'),
-                    value: OptionMenus.EditProfile,
-                  ),
-                  PopupMenuItem(
-                    child: Text('Show Categories'),
+                    child: Text('Categories'),
                     value: OptionMenus.Categories,
                   ),
                 ],
-              )
+              ),
+            ],
+            if (_selectedPageIndex == 2)
+              IconButton(
+                tooltip: 'Manage Account',
+                onPressed: () {
+                  _startAddNewTransaction(context);
+                },
+                icon: Icon(
+                  defaultTargetPlatform == TargetPlatform.iOS
+                      ? CupertinoIcons.settings
+                      : Icons.manage_accounts_rounded,
+                ),
+              ),
           ],
         ),
         body: _isLoading

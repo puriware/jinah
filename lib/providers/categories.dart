@@ -24,41 +24,46 @@ class Categories with ChangeNotifier {
   }
 
   Future<void> fetchAndSetCategories() async {
-    await dotenv.load(fileName: ".env");
-    final apiDB = dotenv.env['FIREBASE_DB'].toString();
-    if (authToken != null) {
-      var url = Uri.https(
-        apiDB,
-        '/categories.json',
-        {
-          'auth': authToken,
-          'orderBy': '"userId"',
-          'equalTo': '"$userId"',
-        },
-      );
-      final response = await http.get(url);
-      if (response.body.isNotEmpty) {
-        final extractedData = jsonDecode(response.body) as Map<String, dynamic>;
-        if (extractedData.isEmpty) {
-          return null;
+    try {
+      await dotenv.load(fileName: ".env");
+      final apiDB = dotenv.env['FIREBASE_DB'].toString();
+      if (authToken != null) {
+        var url = Uri.https(
+          apiDB,
+          '/categories.json',
+          {
+            'auth': authToken,
+            'orderBy': '"userId"',
+            'equalTo': '"$userId"',
+          },
+        );
+        final response = await http.get(url);
+        if (response.body.isNotEmpty) {
+          final extractedData =
+              jsonDecode(response.body) as Map<String, dynamic>;
+          if (extractedData.isEmpty) {
+            return null;
+          }
+          final List<CategoryItem> loadedCategories = [];
+          extractedData.forEach((categoryID, categoryData) {
+            loadedCategories.add(
+              CategoryItem(
+                id: categoryID,
+                userId: categoryData['userId'],
+                name: categoryData['name'],
+                description: categoryData['description'],
+                created: DateTime.parse(categoryData['created'].toString()),
+                updated: DateTime.parse(categoryData['updated'].toString()),
+              ),
+            );
+          });
+          _items = loadedCategories;
+          if (_items.length <= 0) initData();
+          notifyListeners();
         }
-        final List<CategoryItem> loadedCategories = [];
-        extractedData.forEach((categoryID, categoryData) {
-          loadedCategories.add(
-            CategoryItem(
-              id: categoryID,
-              userId: categoryData['userId'],
-              name: categoryData['name'],
-              description: categoryData['description'],
-              created: DateTime.parse(categoryData['created'].toString()),
-              updated: DateTime.parse(categoryData['updated'].toString()),
-            ),
-          );
-        });
-        _items = loadedCategories;
-        if (_items.length <= 0) initData();
-        notifyListeners();
       }
+    } catch (error) {
+      throw error;
     }
   }
 

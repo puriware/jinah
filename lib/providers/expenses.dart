@@ -93,42 +93,47 @@ class Expenses with ChangeNotifier {
   }
 
   Future<void> fetchAndSetExpenses() async {
-    await dotenv.load(fileName: ".env");
-    final apiDB = dotenv.env['FIREBASE_DB'].toString();
-    if (authToken != null) {
-      var url = Uri.https(
-        apiDB,
-        '/expenses.json',
-        {
-          'auth': authToken,
-          'orderBy': '"userId"',
-          'equalTo': '"$userId"',
-        },
-      );
-      final response = await http.get(url);
-      if (response.body.isNotEmpty) {
-        final extractedData = jsonDecode(response.body) as Map<String, dynamic>;
-        if (extractedData.isEmpty) {
-          return null;
+    try {
+      await dotenv.load(fileName: ".env");
+      final apiDB = dotenv.env['FIREBASE_DB'].toString();
+      if (authToken != null) {
+        var url = Uri.https(
+          apiDB,
+          '/expenses.json',
+          {
+            'auth': authToken,
+            'orderBy': '"userId"',
+            'equalTo': '"$userId"',
+          },
+        );
+        final response = await http.get(url);
+        if (response.body.isNotEmpty) {
+          final extractedData =
+              jsonDecode(response.body) as Map<String, dynamic>;
+          if (extractedData.isEmpty) {
+            return null;
+          }
+          final List<ExpensesItem> loadedExpenses = [];
+          extractedData.forEach((expensesID, expensesData) {
+            loadedExpenses.add(
+              ExpensesItem(
+                id: expensesID,
+                userId: expensesData['userId'],
+                trxDate: expensesData['trxDate'],
+                purpose: expensesData['purpose'],
+                amount: expensesData['amount'],
+                category: expensesData['category'],
+                created: DateTime.parse(expensesData['created'].toString()),
+                updated: DateTime.parse(expensesData['updated'].toString()),
+              ),
+            );
+          });
+          _items = loadedExpenses;
+          notifyListeners();
         }
-        final List<ExpensesItem> loadedExpenses = [];
-        extractedData.forEach((expensesID, expensesData) {
-          loadedExpenses.add(
-            ExpensesItem(
-              id: expensesID,
-              userId: expensesData['userId'],
-              trxDate: expensesData['trxDate'],
-              purpose: expensesData['purpose'],
-              amount: expensesData['amount'],
-              category: expensesData['category'],
-              created: DateTime.parse(expensesData['created'].toString()),
-              updated: DateTime.parse(expensesData['updated'].toString()),
-            ),
-          );
-        });
-        _items = loadedExpenses;
-        notifyListeners();
       }
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -240,12 +245,5 @@ class Expenses with ChangeNotifier {
 
   ExpensesItem findById(String id) {
     return _items.firstWhere((prod) => prod.id == id);
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    print('dispose');
   }
 }

@@ -43,31 +43,36 @@ class DailySummary extends StatelessWidget {
             endIndent: large,
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Summary(
-                'Before',
-                limit != null
-                    ? '${(beforeTodays / limit! * 100).toStringAsFixed(2)}%'
-                    : '%',
-                'Rp ${currency.format(beforeTodays)}',
-                Colors.orange,
+              Expanded(
+                child: Summary(
+                  'Before',
+                  limit != null
+                      ? '${(beforeTodays / limit! * 100).toStringAsFixed(2)}%'
+                      : '%',
+                  'Rp ${currency.format(beforeTodays)}',
+                  Colors.orange,
+                ),
               ),
-              Summary(
-                'Today',
-                limit != null
-                    ? '${(todayExpenses / limit! * 100).toStringAsFixed(2)}%'
-                    : '%',
-                'Rp ${currency.format(todayExpenses)}',
-                Colors.red,
+              Expanded(
+                child: Summary(
+                  'Today',
+                  limit != null
+                      ? '${(todayExpenses / limit! * 100).toStringAsFixed(2)}%'
+                      : '%',
+                  'Rp ${currency.format(todayExpenses)}',
+                  Colors.red,
+                ),
               ),
-              Summary(
-                'Left',
-                limit != null
-                    ? '${(limitLeft / limit! * 100).toStringAsFixed(2)}%'
-                    : '%',
-                'Rp ${currency.format(limitLeft)}',
-                Colors.green,
+              Expanded(
+                child: Summary(
+                  'Left',
+                  limit != null
+                      ? '${(limitLeft / limit! * 100).toStringAsFixed(2)}%'
+                      : '%',
+                  'Rp ${currency.format(limitLeft)}',
+                  Colors.green,
+                ),
               ),
             ],
           ),

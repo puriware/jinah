@@ -64,9 +64,31 @@ class UserScreen extends StatelessWidget {
                         Spacer(),
                         AdaptiveFlatButton(
                           'About',
-                          () {},
+                          () {
+                            showDialog<void>(
+                              context: context,
+                              barrierDismissible:
+                                  false, // user must tap button!
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('About Jinah'),
+                                  content: Text(
+                                      'Jinah is a simple daily expense recording application.'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text('Close'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        return;
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
                           null,
-                          null,
+                          Icon(Icons.info_rounded),
                         ),
                         SizedBox(
                           height: medium,

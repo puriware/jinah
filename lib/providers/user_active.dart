@@ -17,42 +17,47 @@ class UserActive with ChangeNotifier {
   }
 
   Future<void> fetchAndSetUser() async {
-    await dotenv.load(fileName: ".env");
-    final apiDB = dotenv.env['FIREBASE_DB'].toString();
-    if (authToken != null) {
-      var url = Uri.https(
-        apiDB,
-        '/users.json',
-        {
-          'auth': authToken,
-          'orderBy': '"userId"',
-          'equalTo': '"$userId"',
-        },
-      );
-      final response = await http.get(url);
-      if (response.body.isNotEmpty) {
-        final extractedData = jsonDecode(response.body) as Map<String, dynamic>;
-        if (extractedData.isEmpty) {
-          return null;
+    try {
+      await dotenv.load(fileName: ".env");
+      final apiDB = dotenv.env['FIREBASE_DB'].toString();
+      if (authToken != null) {
+        var url = Uri.https(
+          apiDB,
+          '/users.json',
+          {
+            'auth': authToken,
+            'orderBy': '"userId"',
+            'equalTo': '"$userId"',
+          },
+        );
+        final response = await http.get(url);
+        if (response.body.isNotEmpty) {
+          final extractedData =
+              jsonDecode(response.body) as Map<String, dynamic>;
+          if (extractedData.isEmpty) {
+            return null;
+          }
+          final List<User> loadedUsers = [];
+          extractedData.forEach((userID, userData) {
+            loadedUsers.add(
+              User(
+                id: userID,
+                userId: userId,
+                firstName: userData['firstName'],
+                lastName: userData['lastName'],
+                limit: userData['limit'],
+                avatar: userData['avatar'],
+                created: DateTime.parse(userData['created'].toString()),
+                updated: DateTime.parse(userData['updated'].toString()),
+              ),
+            );
+          });
+          _activeUser = loadedUsers[0];
+          notifyListeners();
         }
-        final List<User> loadedUsers = [];
-        extractedData.forEach((userID, userData) {
-          loadedUsers.add(
-            User(
-              id: userID,
-              userId: userId,
-              firstName: userData['firstName'],
-              lastName: userData['lastName'],
-              limit: userData['limit'],
-              avatar: userData['avatar'],
-              created: DateTime.parse(userData['created'].toString()),
-              updated: DateTime.parse(userData['updated'].toString()),
-            ),
-          );
-        });
-        _activeUser = loadedUsers[0];
-        notifyListeners();
       }
+    } catch (error) {
+      throw error;
     }
   }
 

@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-        statusBarColor: primaryColor,
+        statusBarColor: Colors.transparent,
       ),
     );
     return MultiProvider(
