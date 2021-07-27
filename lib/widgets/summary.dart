@@ -31,7 +31,7 @@ class Summary extends StatelessWidget {
               focusText,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 24,
+                fontSize: 22,
                 color: color,
               ),
             ),

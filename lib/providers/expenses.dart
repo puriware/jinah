@@ -21,7 +21,7 @@ class Expenses with ChangeNotifier {
   }
 
   List<ExpensesItem> get todays {
-    return _items
+    final result = _items
         .where(
           (item) =>
               item.trxDate.toString() ==
@@ -30,6 +30,11 @@ class Expenses with ChangeNotifier {
               ),
         )
         .toList();
+    if (result.length > 0) {
+      return result;
+    } else {
+      return [];
+    }
   }
 
   double get expensesBeforeTodays {

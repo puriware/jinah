@@ -11,6 +11,7 @@ class Auth with ChangeNotifier {
   String? _token;
   DateTime? _expiryDate;
   String? _userId;
+  String? _password;
   Timer? _authTimer;
 
   bool get isAuth {
@@ -57,6 +58,7 @@ class Auth with ChangeNotifier {
       } else {
         this._userId = responseData['localId'];
         this._token = responseData['idToken'];
+        this._password = password;
         this._expiryDate = DateTime.now().add(
           Duration(
             seconds: int.parse(
@@ -72,6 +74,7 @@ class Auth with ChangeNotifier {
         {
           'token': _token,
           'userId': _userId,
+          'password': _password,
           'expiryDate': _expiryDate!.toIso8601String()
         },
       );
@@ -103,11 +106,12 @@ class Auth with ChangeNotifier {
     //as Map<String, Object>;
     final expiryDate =
         DateTime.parse(extractedUserData['expiryDate'].toString());
-
+    final userId = extractedUserData['userId'].toString();
+    final password = extractedUserData['password'].toString();
     if (expiryDate.isBefore(DateTime.now())) {
+      await signIn(userId, password);
       return false;
     }
-
     _token = extractedUserData['token'].toString();
     _userId = extractedUserData['userId'].toString();
     _expiryDate = expiryDate;
@@ -126,7 +130,7 @@ class Auth with ChangeNotifier {
     }
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    //prefs.remove('userData');
+    prefs.remove('userData');
     prefs.clear();
   }
 

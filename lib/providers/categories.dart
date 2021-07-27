@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/category_item.dart';
@@ -20,7 +21,12 @@ class Categories with ChangeNotifier {
   }
 
   String categoryName(String id) {
-    return _items.firstWhere((cat) => cat.id == id).name.toString();
+    CategoryItem? result = _items.firstWhere((cat) => cat.id == id);
+    if (result.name != null) {
+      return result.name.toString();
+    } else {
+      return '';
+    }
   }
 
   Future<void> fetchAndSetCategories() async {
@@ -42,6 +48,7 @@ class Categories with ChangeNotifier {
           final extractedData =
               jsonDecode(response.body) as Map<String, dynamic>;
           if (extractedData.isEmpty) {
+            initData();
             return null;
           }
           final List<CategoryItem> loadedCategories = [];
@@ -170,25 +177,27 @@ class Categories with ChangeNotifier {
   }
 
   void initData() async {
-    var uncategorized = CategoryItem(
-      id: null,
-      userId: userId,
-      name: 'Uncategorized',
-      description: 'for data without categories',
-      created: DateTime.now(),
-      updated: DateTime.now(),
-    );
+    if (userId != null) {
+      var uncategorized = CategoryItem(
+        id: null,
+        userId: userId,
+        name: 'Uncategorized',
+        description: 'for data without categories',
+        created: DateTime.now(),
+        updated: DateTime.now(),
+      );
 
-    var foodAndDrink = CategoryItem(
-      id: null,
-      userId: userId,
-      name: 'Food & Drink',
-      description: 'for data food and drink',
-      created: DateTime.now(),
-      updated: DateTime.now(),
-    );
+      var foodAndDrink = CategoryItem(
+        id: null,
+        userId: userId,
+        name: 'Food & Drink',
+        description: 'for data food and drink',
+        created: DateTime.now(),
+        updated: DateTime.now(),
+      );
 
-    await addCategoryItem(uncategorized);
-    await addCategoryItem(foodAndDrink);
+      await addCategoryItem(uncategorized);
+      await addCategoryItem(foodAndDrink);
+    }
   }
 }

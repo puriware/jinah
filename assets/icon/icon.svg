@@ -12,7 +12,7 @@
    class="iconLeft"
    version="1.1"
    id="svg22"
-   sodipodi:docname="jinah.svg"
+   sodipodi:docname="icon.svg"
    inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)">
   <metadata
      id="metadata26">
@@ -22,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -35,17 +35,18 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2048"
-     inkscape:window-height="1089"
+     inkscape:window-width="2560"
+     inkscape:window-height="1361"
      id="namedview24"
      showgrid="false"
      inkscape:zoom="0.25043365"
      inkscape:cx="-395.63857"
      inkscape:cy="552.5087"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg22" />
+     inkscape:current-layer="svg22"
+     inkscape:document-rotation="0" />
   <!---->
   <defs
      data-v-fde0c5aa=""
@@ -79,7 +80,7 @@
      id="6eb46e39-561c-4ad9-ba11-aa042c2af851"
      stroke="none"
      fill="#fbe1d5"
-     transform="matrix(9.4794129,0,0,9.4794129,130.39931,131.66013)"
+     transform="matrix(8.0296204,0,0,8.0296204,202.22059,203.28857)"
      style="fill:#ffffff;fill-opacity:1"
      inkscape:export-xdpi="96"
      inkscape:export-ydpi="96">

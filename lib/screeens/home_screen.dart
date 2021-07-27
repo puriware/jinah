@@ -1,7 +1,11 @@
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:puri_expenses/constants.dart';
+import 'package:puri_expenses/models/user.dart';
+import 'package:puri_expenses/screeens/expenses_history_screen.dart';
 import 'package:puri_expenses/widgets/message_dialog.dart';
 import '../../providers/categories.dart';
 import '../../providers/expenses.dart';
@@ -30,6 +34,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var _isInit = true;
   var _isLoading = false;
+  User? _activeUser;
 
   @override
   void didChangeDependencies() async {
@@ -54,7 +59,11 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           _isLoading = false;
         });
-        _isInit = false;
+
+        _activeUser = Provider.of<UserActive>(
+          context,
+          listen: false,
+        ).userActive;
       } catch (error) {
         if (mounted) {
           MessageDialog.showPopUpMessage(
@@ -77,6 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
       'title': Text('Expenses Summary'),
     },
     {
+      'page': ExpensesHistoryScreen(),
+      'title': Text('Expenses History'),
+    },
+    {
       'page': UserScreen(),
       'title': Text('Account'),
     },
@@ -89,8 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _startEditUserData(BuildContext ctx) {
-    showModalBottomSheet(
+  Future<void> _startEditUserData(BuildContext ctx) async {
+    await showModalBottomSheet(
       isScrollControlled: true,
       context: ctx,
       builder: (_) {
@@ -103,8 +116,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _startAddNewTransaction(BuildContext ctx) {
-    showModalBottomSheet(
+  void _startAddNewTransaction(BuildContext ctx) async {
+    if (_activeUser == null || _activeUser!.limit == null) {
+      await MessageDialog.showPopUpMessage(
+        context,
+        'Expenses Limit',
+        'The spending limit data has not been set. Please set a spending limit in advance.',
+      );
+      await _startEditUserData(ctx);
+    }
+    await showModalBottomSheet(
       isScrollControlled: true,
       context: ctx,
       builder: (_) {
@@ -153,8 +174,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 onSelected: (OptionMenus selectedValue) {
                   if (selectedValue == OptionMenus.Categories) {
                     Navigator.of(context).pushNamed(CategoryScreen.routeName);
-                  } else if (selectedValue == OptionMenus.EditProfile) {
-                    _startEditUserData(context);
                   }
                 },
                 icon: Icon(
@@ -168,11 +187,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ],
-            if (_selectedPageIndex == 2)
+            if (_selectedPageIndex == 3)
               IconButton(
                 tooltip: 'Manage Account',
                 onPressed: () {
-                  _startAddNewTransaction(context);
+                  _startEditUserData(context);
                 },
                 icon: Icon(
                   defaultTargetPlatform == TargetPlatform.iOS
@@ -192,21 +211,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (_selectedPageIndex == 0) ExpensesThisMonthScreen()
                 ],
               ),
-        bottomNavigationBar: BottomNavigationBar(
-          onTap: _selectPage,
-          currentIndex: _selectedPageIndex,
+        bottomNavigationBar: BottomNavyBar(
+          onItemSelected: _selectPage,
+          selectedIndex: _selectedPageIndex,
           items: [
-            BottomNavigationBarItem(
+            BottomNavyBarItem(
               icon: Icon(Icons.list_rounded),
-              label: 'Timeline',
+              title: Text('Timeline'),
+              activeColor: primaryColor,
+              inactiveColor: Colors.grey,
             ),
-            BottomNavigationBarItem(
+            BottomNavyBarItem(
               icon: Icon(Icons.bar_chart_rounded),
-              label: 'Summary',
+              title: Text('Summary'),
+              activeColor: primaryColor,
+              inactiveColor: Colors.grey,
             ),
-            BottomNavigationBarItem(
+            BottomNavyBarItem(
+              icon: Icon(Icons.history_rounded),
+              title: Text('History'),
+              activeColor: primaryColor,
+              inactiveColor: Colors.grey,
+            ),
+            BottomNavyBarItem(
               icon: Icon(Icons.person_outline_rounded),
-              label: 'Account',
+              title: Text('Account'),
+              activeColor: primaryColor,
+              inactiveColor: Colors.grey,
             ),
           ],
         ),
