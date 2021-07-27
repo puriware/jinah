@@ -44,14 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = true;
       });
       try {
-        await Provider.of<Categories>(
-          context,
-          listen: false,
-        ).fetchAndSetCategories();
         await Provider.of<UserActive>(
           context,
           listen: false,
         ).fetchAndSetUser();
+        await Provider.of<Categories>(
+          context,
+          listen: false,
+        ).fetchAndSetCategories();
         await Provider.of<Expenses>(
           context,
           listen: false,
@@ -59,7 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           _isLoading = false;
         });
-
         _activeUser = Provider.of<UserActive>(
           context,
           listen: false,

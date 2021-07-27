@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.puriware.expenses">
     <uses-permission android:name="android.permission.INTERNET" />
+<<<<<<< HEAD
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+=======
+>>>>>>> 30ad61b09b6b31971059f246b33c8bf10a63b057
    <application
         android:label="Jinah"
         android:icon="@mipmap/launcher_icon">
