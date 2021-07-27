@@ -75,7 +75,7 @@ class _NewExpensesState extends State<NewExpenses> {
     }
     final enteredPurpose = _purposeController.text;
     final enteredAmount = double.parse(_amountController.text);
-    if (enteredPurpose.isEmpty || enteredAmount <= 0 || _selectedDate == null) {
+    if (enteredPurpose.isEmpty || enteredAmount <= 0) {
       return;
     }
     setState(() {

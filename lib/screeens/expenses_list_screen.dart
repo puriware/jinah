@@ -3,10 +3,11 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:puri_expenses/providers/categories.dart';
+import 'package:puri_expenses/widgets/message_dialog.dart';
+import 'package:puri_expenses/widgets/new_expenses.dart';
 import '../../constants.dart';
 import '../../providers/user_active.dart';
 import '../../widgets/daily_summary.dart';
-import '../../widgets/list_expenses.dart';
 import '../models/expenses_item.dart';
 import '../providers/expenses.dart';
 
@@ -100,6 +101,49 @@ class ExpensesListScreen extends StatelessWidget {
                       color: Colors.red,
                     ),
                   ),
+                  onLongPress: () {
+                    MessageDialog.showMessageDialog(
+                      context,
+                      'Delete Expenses',
+                      'Are you sure to delete Expenses data?',
+                      'Delete',
+                      () async {
+                        try {
+                          await Provider.of<Expenses>(context, listen: false)
+                              .deleteExpensesItem(expense.id!);
+                        } catch (error) {
+                          MessageDialog.showPopUpMessage(
+                            context,
+                            'Delete Expenses',
+                            'Failed to delete data expenses!',
+                          );
+                        }
+                      },
+                    );
+                  },
+                  onTap: () {
+                    MessageDialog.showMessageDialog(
+                      context,
+                      'Edit Expenses',
+                      'Are you sure to edit Expenses data?',
+                      'Yes',
+                      () async {
+                        await showModalBottomSheet(
+                          isScrollControlled: true,
+                          context: ctx,
+                          builder: (_) {
+                            return GestureDetector(
+                              onTap: () {},
+                              child: NewExpenses(
+                                expensesId: expense.id,
+                              ),
+                              behavior: HitTestBehavior.opaque,
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
             ),
