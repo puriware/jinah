@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 final appTitle = 'Jinah';
+
+final currency = NumberFormat.simpleCurrency(locale: "id_ID");
 
 final small = 2.0;
 final smallMedium = 4.0;

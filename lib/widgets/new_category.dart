@@ -124,7 +124,7 @@ class _NewCategoryState extends State<NewCategory> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(120.0, 0.0, 120.0, 8.0),
+                    padding: const EdgeInsets.fromLTRB(148.0, 0.0, 148.0, 8.0),
                     child: Container(
                       height: 8.0,
                       width: 8.0,

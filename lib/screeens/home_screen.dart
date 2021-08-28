@@ -2,6 +2,7 @@ import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:puri_expenses/constants.dart';
 import 'package:puri_expenses/models/user.dart';
@@ -12,7 +13,6 @@ import '../../providers/expenses.dart';
 import '../../providers/user_active.dart';
 import '../../screeens/category_screen.dart';
 import '../../screeens/edit_user_screen.dart';
-import '../../screeens/expenses_this_month_screen.dart';
 import '../../screeens/expenses_summary_screen.dart';
 import '../../screeens/user_screen.dart';
 import '../screeens/expenses_list_screen.dart';
@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   var _isInit = true;
   var _isLoading = false;
   User? _activeUser;
+  PageController _pageController = PageController();
 
   @override
   void didChangeDependencies() async {
@@ -75,10 +76,20 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   List<Map<String, Widget>> _pages = [
     {
       'page': ExpensesListScreen(),
-      'title': Text('Expenses List'),
+      'title': Text(
+        DateFormat('EEEE - dd MMMM yyyy').format(
+          DateTime.now(),
+        ),
+      ),
     },
     {
       'page': ExpensesSummaryScreen(),
@@ -105,11 +116,23 @@ class _HomeScreenState extends State<HomeScreen> {
     await showModalBottomSheet(
       isScrollControlled: true,
       context: ctx,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(large),
+          topRight: Radius.circular(large),
+        ),
+      ),
       builder: (_) {
-        return GestureDetector(
-          onTap: () {},
-          child: EditUserScreen(),
-          behavior: HitTestBehavior.opaque,
+        return ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(large),
+            topRight: Radius.circular(large),
+          ),
+          child: GestureDetector(
+            onTap: () {},
+            child: EditUserScreen(),
+            behavior: HitTestBehavior.opaque,
+          ),
         );
       },
     );
@@ -126,12 +149,24 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     await showModalBottomSheet(
       isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(large),
+          topRight: Radius.circular(large),
+        ),
+      ),
       context: ctx,
       builder: (_) {
-        return GestureDetector(
-          onTap: () {},
-          child: NewExpenses(),
-          behavior: HitTestBehavior.opaque,
+        return ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(large),
+            topRight: Radius.circular(large),
+          ),
+          child: GestureDetector(
+            onTap: () {},
+            child: NewExpenses(),
+            behavior: HitTestBehavior.opaque,
+          ),
         );
       },
     );
@@ -143,19 +178,20 @@ class _HomeScreenState extends State<HomeScreen> {
       length: _selectedPageIndex == 0 ? 2 : 1,
       child: Scaffold(
         appBar: AppBar(
+          elevation: 0,
           title: _pages[_selectedPageIndex]['title'],
-          bottom: _selectedPageIndex == 0
-              ? TabBar(
-                  tabs: [
-                    Tab(
-                      text: 'Today',
-                    ),
-                    Tab(
-                      text: 'This Month',
-                    ),
-                  ],
-                )
-              : null,
+          // bottom: _selectedPageIndex == 0
+          //     ? TabBar(
+          //         tabs: [
+          //           Tab(
+          //             text: 'Today',
+          //           ),
+          //           Tab(
+          //             text: 'This Month',
+          //           ),
+          //         ],
+          //       )
+          //     : null,
           actions: [
             if (_selectedPageIndex == 0) ...[
               IconButton(
@@ -204,14 +240,22 @@ class _HomeScreenState extends State<HomeScreen> {
             ? Center(
                 child: CircularProgressIndicator(),
               )
-            : TabBarView(
-                children: [
-                  _pages[_selectedPageIndex]['page']!,
-                  if (_selectedPageIndex == 0) ExpensesThisMonthScreen()
-                ],
+            : PageView(
+                controller: _pageController,
+                onPageChanged: _selectPage,
+                children: _pages.map((page) => page['page'] as Widget).toList(),
               ),
+        // : TabBarView(
+        //     children: [
+        //       _pages[_selectedPageIndex]['page']!,
+        //       if (_selectedPageIndex == 0) ExpensesThisMonthScreen()
+        //     ],
+        //   ),
         bottomNavigationBar: BottomNavyBar(
-          onItemSelected: _selectPage,
+          onItemSelected: (index) {
+            _selectPage(index);
+            _pageController.jumpToPage(index);
+          },
           selectedIndex: _selectedPageIndex,
           items: [
             BottomNavyBarItem(

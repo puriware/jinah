@@ -13,6 +13,7 @@ class Auth with ChangeNotifier {
   String? _userId;
   String? _password;
   Timer? _authTimer;
+  var _saveLogin = false;
 
   bool get isAuth {
     return token != null;
@@ -67,14 +68,29 @@ class Auth with ChangeNotifier {
           ),
         );
       }
-      _autoLogout();
-      notifyListeners();
+
       final prefs = await SharedPreferences.getInstance();
+
+      // if (_saveLogin) {
+      //   if (!prefs.containsKey('userLogin')) {
+      //     final userLogin = jsonEncode(
+      //       {
+      //         'email': email,
+      //         'password': password,
+      //       },
+      //     );
+      //     await prefs.setString('userLogin', userLogin);
+      //   }
+      // } else {
+      if (!_saveLogin) {
+        _autoLogout();
+      }
+
       final userData = jsonEncode(
         {
           'token': _token,
           'userId': _userId,
-          'password': _password,
+          'password': _saveLogin ? _password : '',
           'expiryDate': _expiryDate!.toIso8601String()
         },
       );
@@ -82,16 +98,22 @@ class Auth with ChangeNotifier {
         'userData',
         userData,
       );
+
+      notifyListeners();
     } catch (error) {
       throw error;
     }
   }
 
-  Future<void> signUp(String email, String password) async {
+  Future<void> signUp(String email, String password,
+      {bool saveLogin = false}) async {
+    _saveLogin = saveLogin;
     return _authenticate(email, password, 'signUp');
   }
 
-  Future<void> signIn(String email, String password) async {
+  Future<void> signIn(String email, String password,
+      {bool saveLogin = false}) async {
+    _saveLogin = saveLogin;
     return _authenticate(email, password, 'signInWithPassword');
   }
 
@@ -109,7 +131,10 @@ class Auth with ChangeNotifier {
     final userId = extractedUserData['userId'].toString();
     final password = extractedUserData['password'].toString();
     if (expiryDate.isBefore(DateTime.now())) {
-      await signIn(userId, password);
+      if (password != '') {
+        _saveLogin = true;
+        await signIn(userId, password);
+      }
       return false;
     }
     _token = extractedUserData['token'].toString();

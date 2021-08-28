@@ -28,6 +28,7 @@ class UserScreen extends StatelessWidget {
                   child: CircleAvatar(
                     child: Icon(
                       Icons.person,
+                      size: deviceSize.width * 0.4,
                     ),
                   ),
                 ),
@@ -49,7 +50,7 @@ class UserScreen extends StatelessWidget {
                 ),
                 Text(
                   userData.userActive != null
-                      ? 'Rp ${userData.userActive!.limit.toString()}'
+                      ? currency.format(userData.userActive!.limit)
                       : 'Rp 0',
                   style: Theme.of(context).textTheme.headline6,
                   textAlign: TextAlign.center,

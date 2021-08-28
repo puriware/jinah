@@ -22,11 +22,23 @@ class CategoryScreen extends StatelessWidget {
               showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(large),
+                    topRight: Radius.circular(large),
+                  ),
+                ),
                 builder: (_) {
-                  return GestureDetector(
-                    onTap: () {},
-                    child: NewCategory(),
-                    behavior: HitTestBehavior.opaque,
+                  return ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(large),
+                      topRight: Radius.circular(large),
+                    ),
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: NewCategory(),
+                      behavior: HitTestBehavior.opaque,
+                    ),
                   );
                 },
               );

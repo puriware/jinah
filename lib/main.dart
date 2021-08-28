@@ -95,12 +95,12 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Lato',
             primarySwatch: generateMaterialColor(primaryColor),
             accentColor: Colors.amberAccent,
-            appBarTheme: AppBarTheme.of(context).copyWith(
-              centerTitle: true,
-            ),
+            // appBarTheme: AppBarTheme.of(context).copyWith(
+            //   centerTitle: true,
+            // ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                primary: Colors.green,
+                primary: primaryColor,
               ),
             ),
           ),
