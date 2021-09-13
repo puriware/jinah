@@ -12,7 +12,6 @@ import '../providers/expenses.dart';
 import '../screeens/auth_screen.dart';
 import '../screeens/home_screen.dart';
 import '../screeens/splash_screen.dart';
-import '../widgets/new_expenses.dart';
 
 void main() {
   runApp(MyApp());
@@ -95,9 +94,21 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Lato',
             primarySwatch: generateMaterialColor(primaryColor),
             accentColor: Colors.amberAccent,
-            // appBarTheme: AppBarTheme.of(context).copyWith(
-            //   centerTitle: true,
-            // ),
+            scaffoldBackgroundColor: primaryLightBackground,
+            appBarTheme: AppBarTheme.of(context).copyWith(
+              centerTitle: true,
+              elevation: 0,
+              foregroundColor: primaryColor,
+              backgroundColor: primaryLightBackground,
+              iconTheme: IconThemeData(color: primaryColor),
+              textTheme: TextTheme(
+                headline6: TextStyle(
+                  color: primaryColor,
+                  fontSize: 22,
+                  //fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                 primary: primaryColor,
@@ -115,7 +126,6 @@ class MyApp extends StatelessWidget {
                           : AuthScreen(),
                 ),
           routes: {
-            NewExpenses.routeName: (ctx) => NewExpenses(),
             CategoryScreen.routeName: (ctx) => CategoryScreen(),
           },
         ),

@@ -2,12 +2,12 @@ import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:puri_expenses/constants.dart';
-import 'package:puri_expenses/models/user.dart';
-import 'package:puri_expenses/screeens/expenses_history_screen.dart';
-import 'package:puri_expenses/widgets/message_dialog.dart';
+import 'package:puri_expenses/models/expense.dart';
+import '../constants.dart';
+import '../models/user.dart';
+import '../screeens/expenses_history_screen.dart';
+import '../widgets/message_dialog.dart';
 import '../../providers/categories.dart';
 import '../../providers/expenses.dart';
 import '../../providers/user_active.dart';
@@ -84,16 +84,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Map<String, Widget>> _pages = [
     {
-      'page': ExpensesListScreen(),
-      'title': Text(
-        DateFormat('EEEE - dd MMMM yyyy').format(
-          DateTime.now(),
-        ),
-      ),
+      'page': ExpensesSummaryScreen(),
+      'title': Text('Jinah Summary'),
     },
     {
-      'page': ExpensesSummaryScreen(),
-      'title': Text('Expenses Summary'),
+      'page': ExpensesListScreen(),
+      'title': Text('Expenses List'),
     },
     {
       'page': ExpensesHistoryScreen(),
@@ -112,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> _startEditUserData(BuildContext ctx) async {
+  void _startEditUserData(BuildContext ctx) async {
     await showModalBottomSheet(
       isScrollControlled: true,
       context: ctx,
@@ -145,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'Expenses Limit',
         'The spending limit data has not been set. Please set a spending limit in advance.',
       );
-      await _startEditUserData(ctx);
+      _startEditUserData(ctx);
     }
     await showModalBottomSheet(
       isScrollControlled: true,
@@ -164,12 +160,41 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           child: GestureDetector(
             onTap: () {},
-            child: NewExpenses(),
+            child: NewExpenses(_saveExpenses),
             behavior: HitTestBehavior.opaque,
           ),
         );
       },
     );
+  }
+
+  Future _saveExpenses(Expense data) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await Provider.of<Expenses>(context, listen: false).addExpense(data);
+    } catch (error) {
+      await showDialog<Null>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('An error occurred!'),
+          content: Text(
+            'Something went wrong. ${error.toString()}',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('Okay'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -180,20 +205,20 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           elevation: 0,
           title: _pages[_selectedPageIndex]['title'],
-          // bottom: _selectedPageIndex == 0
-          //     ? TabBar(
-          //         tabs: [
-          //           Tab(
-          //             text: 'Today',
-          //           ),
-          //           Tab(
-          //             text: 'This Month',
-          //           ),
-          //         ],
-          //       )
-          //     : null,
           actions: [
-            if (_selectedPageIndex == 0) ...[
+            if (_selectedPageIndex == 0)
+              IconButton(
+                tooltip: 'Add new Expenses',
+                onPressed: () {
+                  _startAddNewTransaction(context);
+                },
+                icon: Icon(
+                  defaultTargetPlatform == TargetPlatform.iOS
+                      ? CupertinoIcons.add
+                      : Icons.add_rounded,
+                ),
+              ),
+            if (_selectedPageIndex == 1) ...[
               IconButton(
                 tooltip: 'Add new Expenses',
                 onPressed: () {
@@ -245,12 +270,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPageChanged: _selectPage,
                 children: _pages.map((page) => page['page'] as Widget).toList(),
               ),
-        // : TabBarView(
-        //     children: [
-        //       _pages[_selectedPageIndex]['page']!,
-        //       if (_selectedPageIndex == 0) ExpensesThisMonthScreen()
-        //     ],
-        //   ),
         bottomNavigationBar: BottomNavyBar(
           onItemSelected: (index) {
             _selectPage(index);
@@ -259,14 +278,14 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedIndex: _selectedPageIndex,
           items: [
             BottomNavyBarItem(
-              icon: Icon(Icons.list_rounded),
-              title: Text('Timeline'),
+              icon: Icon(Icons.home_rounded),
+              title: Text('Home'),
               activeColor: primaryColor,
               inactiveColor: Colors.grey,
             ),
             BottomNavyBarItem(
-              icon: Icon(Icons.bar_chart_rounded),
-              title: Text('Summary'),
+              icon: Icon(Icons.list_rounded),
+              title: Text('Timeline'),
               activeColor: primaryColor,
               inactiveColor: Colors.grey,
             ),

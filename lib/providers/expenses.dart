@@ -2,32 +2,30 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:intl/intl.dart';
-import '../models/expenses_item.dart';
+import '../models/expense.dart';
 import '../models/http_exception.dart';
 import 'package:http/http.dart' as http;
 
 class Expenses with ChangeNotifier {
   // final uuid = Uuid();
-  List<ExpensesItem> _items = [];
+  List<Expense> _items = [];
 
   final String? authToken;
   final String? userId;
 
   Expenses(this._items, {this.authToken, this.userId});
 
-  List<ExpensesItem> get items {
+  List<Expense> get items {
     return [..._items];
   }
 
-  List<ExpensesItem> get todays {
+  List<Expense> get todays {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
     final result = _items
         .where(
-          (item) =>
-              item.trxDate.toString() ==
-              DateFormat('yyyy-MM-dd').format(
-                DateTime.now(),
-              ),
+          (item) => DateTime.parse(item.trxDate!).isAtSameMomentAs(today),
         )
         .toList();
     if (result.length > 0) {
@@ -38,56 +36,22 @@ class Expenses with ChangeNotifier {
   }
 
   double get expensesBeforeTodays {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
     var result = thisMonth
         .where(
-          (item) =>
-              int.parse(
-                DateFormat('D').format(
-                  DateTime.parse(
-                    item.trxDate.toString(),
-                  ),
-                ),
-              ) <
-              int.parse(
-                DateFormat('D').format(
-                  DateTime.now(),
-                ),
-              ),
+          (item) => DateTime.parse(item.trxDate!).isBefore(today),
         )
         .toList();
     var total = 0.0;
     result.forEach((exp) {
-      total += exp.amount!;
+      total += exp.amount;
     });
     return total;
   }
 
-  double get todayExpenses {
-    var result = todays
-        .where(
-          (item) =>
-              int.parse(
-                DateFormat('D').format(
-                  DateTime.parse(
-                    item.trxDate.toString(),
-                  ),
-                ),
-              ) ==
-              int.parse(
-                DateFormat('D').format(
-                  DateTime.now(),
-                ),
-              ),
-        )
-        .toList();
-    var total = 0.0;
-    result.forEach((exp) {
-      total += exp.amount!;
-    });
-    return total;
-  }
-
-  List<ExpensesItem> get thisMonth {
+  List<Expense> get thisMonth {
     return _items
         .where(
           (item) =>
@@ -95,6 +59,80 @@ class Expenses with ChangeNotifier {
               DateTime.now().month,
         )
         .toList();
+  }
+
+  List<Expense> get thisWeekExpenses {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final weekday = today.weekday;
+    final startWeek = today.add(
+      Duration(
+        days: -weekday,
+      ),
+    );
+
+    return [
+      ..._items
+          .where(
+            (exp) =>
+                exp.trxDate != null &&
+                DateTime.parse(exp.trxDate!).isAfter(startWeek),
+          )
+          .toList()
+    ];
+  }
+
+  List<Expense> get prevWeekExpenses {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final weekday = today.weekday;
+    final startWeek = today.add(Duration(days: -(7 + weekday)));
+    final endWeek = today.add(Duration(days: -weekday));
+    return [
+      ..._items
+          .where(
+            (vst) =>
+                vst.trxDate != null &&
+                DateTime.parse(vst.trxDate!).isAfter(startWeek) &&
+                DateTime.parse(vst.trxDate!).isBefore(endWeek),
+          )
+          .toList()
+    ];
+  }
+
+  double get thisWeekTotalExpenses {
+    final amountList = thisWeekExpenses.map((e) => e.amount);
+    var total = amountList.reduce((value, element) => value + element);
+    return total;
+  }
+
+  double get thisMonthTotalExpenses {
+    final amountList = thisMonth.map((e) => e.amount);
+    var total = amountList.reduce((value, element) => value + element);
+    return total;
+  }
+
+  double get prevWeekTotalExpenses {
+    final amountList = prevWeekExpenses.map((e) => e.amount);
+    var total = amountList.reduce((value, element) => value + element);
+    return total;
+  }
+
+  double get todaysTotalExpenses {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final result = _items
+        .where(
+          (exp) => exp.trxDate != null && DateTime.parse(exp.trxDate!) == today,
+        )
+        .toList();
+    var total = 0.0;
+    if (result.isNotEmpty) {
+      final amountList = result.map((e) => e.amount);
+      total = amountList.reduce((value, element) => value + element);
+    }
+    return total;
   }
 
   Future<void> fetchAndSetExpenses() async {
@@ -118,10 +156,10 @@ class Expenses with ChangeNotifier {
           if (extractedData.isEmpty) {
             return null;
           }
-          final List<ExpensesItem> loadedExpenses = [];
+          final List<Expense> loadedExpenses = [];
           extractedData.forEach((expensesID, expensesData) {
             loadedExpenses.add(
-              ExpensesItem(
+              Expense(
                 id: expensesID,
                 userId: expensesData['userId'],
                 trxDate: expensesData['trxDate'],
@@ -142,7 +180,7 @@ class Expenses with ChangeNotifier {
     }
   }
 
-  Future<void> addExpensesItem(ExpensesItem expensesItem) async {
+  Future<void> addExpense(Expense expense) async {
     await dotenv.load(fileName: ".env");
     final apiDB = dotenv.env['FIREBASE_DB'].toString();
     final url = Uri.https(
@@ -156,50 +194,45 @@ class Expenses with ChangeNotifier {
         body: jsonEncode(
           {
             'userId': userId,
-            'trxDate': expensesItem.trxDate,
-            'purpose': expensesItem.purpose,
-            'amount': expensesItem.amount,
-            'category': expensesItem.category,
-            'created': expensesItem.created != null
-                ? expensesItem.created!.toIso8601String()
+            'trxDate': expense.trxDate,
+            'purpose': expense.purpose,
+            'amount': expense.amount,
+            'category': expense.category,
+            'created': expense.created != null
+                ? expense.created!.toIso8601String()
                 : DateTime.now().toIso8601String(),
-            'updated': expensesItem.updated != null
-                ? expensesItem.updated!.toIso8601String()
+            'updated': expense.updated != null
+                ? expense.updated!.toIso8601String()
                 : DateTime.now().toIso8601String(),
           },
         ),
       );
       final res = jsonDecode(response.body);
-      final newExpensesItem = ExpensesItem(
+      final newExpense = Expense(
         id: res['name'],
-        userId: expensesItem.userId,
-        trxDate: expensesItem.trxDate,
-        purpose: expensesItem.purpose,
-        amount: expensesItem.amount,
-        category: expensesItem.category,
-        created: expensesItem.created != null
-            ? expensesItem.created!
-            : DateTime.now(),
-        updated: expensesItem.updated != null
-            ? expensesItem.updated!
-            : DateTime.now(),
+        userId: expense.userId,
+        trxDate: expense.trxDate,
+        purpose: expense.purpose,
+        amount: expense.amount,
+        category: expense.category,
+        created: expense.created != null ? expense.created! : DateTime.now(),
+        updated: expense.updated != null ? expense.updated! : DateTime.now(),
       );
-      _items.add(newExpensesItem);
+      _items.add(newExpense);
       notifyListeners();
     } catch (error) {
       throw error;
     }
   }
 
-  Future<void> updateExpensesItem(ExpensesItem newExpensesItem) async {
+  Future<void> updateExpense(Expense newExpense) async {
     await dotenv.load(fileName: ".env");
     final apiDB = dotenv.env['FIREBASE_DB'].toString();
-    final prodIndex =
-        _items.indexWhere((prod) => prod.id == newExpensesItem.id);
+    final prodIndex = _items.indexWhere((prod) => prod.id == newExpense.id);
     if (prodIndex >= 0) {
       final url = Uri.https(
         apiDB,
-        '/expenses/${newExpensesItem.id}.json',
+        '/expenses/${newExpense.id}.json',
         {'auth': authToken},
       );
       try {
@@ -207,15 +240,15 @@ class Expenses with ChangeNotifier {
           url,
           body: jsonEncode(
             {
-              'trxDate': newExpensesItem.trxDate,
-              'purpose': newExpensesItem.purpose,
-              'amount': newExpensesItem.amount,
-              'category': newExpensesItem.category,
+              'trxDate': newExpense.trxDate,
+              'purpose': newExpense.purpose,
+              'amount': newExpense.amount,
+              'category': newExpense.category,
               'updated': DateTime.now().toIso8601String(),
             },
           ),
         );
-        _items[prodIndex] = newExpensesItem;
+        _items[prodIndex] = newExpense;
         notifyListeners();
       } catch (error) {
         throw error;
@@ -223,7 +256,7 @@ class Expenses with ChangeNotifier {
     }
   }
 
-  Future<void> deleteExpensesItem(String id) async {
+  Future<void> deleteExpense(String id) async {
     await dotenv.load(fileName: ".env");
     final apiDB = dotenv.env['FIREBASE_DB'].toString();
     final url = Uri.https(
@@ -231,24 +264,23 @@ class Expenses with ChangeNotifier {
       '/expenses/$id.json',
       {'auth': authToken},
     );
-    final existingExpensesItemIndex =
-        _items.indexWhere((prod) => prod.id == id);
-    var existingExpensesItem = _items[existingExpensesItemIndex];
-    _items.removeAt(existingExpensesItemIndex);
+    final existingExpenseIndex = _items.indexWhere((prod) => prod.id == id);
+    var existingExpense = _items[existingExpenseIndex];
+    _items.removeAt(existingExpenseIndex);
     notifyListeners();
     final response = await http.delete(url);
     if (response.statusCode >= 400) {
       _items.insert(
-        existingExpensesItemIndex,
-        existingExpensesItem,
+        existingExpenseIndex,
+        existingExpense,
       );
       notifyListeners();
-      throw HttpException('Could not delete ExpensesItem.');
+      throw HttpException('Could not delete Expense.');
     }
-    //existingExpensesItem = null;
+    //existingExpense = null;
   }
 
-  ExpensesItem findById(String id) {
+  Expense findById(String id) {
     return _items.firstWhere((prod) => prod.id == id);
   }
 }

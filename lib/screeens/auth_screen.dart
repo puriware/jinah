@@ -111,7 +111,8 @@ class AuthCard extends StatefulWidget {
   _AuthCardState createState() => _AuthCardState();
 }
 
-class _AuthCardState extends State<AuthCard> {
+class _AuthCardState extends State<AuthCard>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey();
   AuthMode _authMode = AuthMode.Login;
   Map<String, String> _authData = {
@@ -120,8 +121,38 @@ class _AuthCardState extends State<AuthCard> {
   };
   var _isLoading = false;
   final _passwordController = TextEditingController();
-  var _isSaveLogin = false;
   var _passwordVisible = false;
+  AnimationController? _ctrlAnimation;
+  Animation<Size>? _heightAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrlAnimation = AnimationController(
+      vsync: this,
+      duration: Duration(
+        milliseconds: 700,
+      ),
+      reverseDuration: Duration(
+        milliseconds: 500,
+      ),
+    );
+    _heightAnimation = Tween<Size>(
+      begin: Size(double.infinity, 290),
+      end: Size(double.infinity, 350),
+    ).animate(
+      CurvedAnimation(
+        parent: _ctrlAnimation!,
+        curve: Curves.fastOutSlowIn,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (_ctrlAnimation != null) _ctrlAnimation!.dispose();
+  }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -156,14 +187,12 @@ class _AuthCardState extends State<AuthCard> {
         await Provider.of<Auth>(context, listen: false).signIn(
           _authData['email'].toString(),
           _authData['password'].toString(),
-          saveLogin: _isSaveLogin,
         );
       } else {
         // Sign user up
         await Provider.of<Auth>(context, listen: false).signUp(
           _authData['email'].toString(),
           _authData['password'].toString(),
-          saveLogin: _isSaveLogin,
         );
       }
     } on HttpException catch (error) {
@@ -198,10 +227,12 @@ class _AuthCardState extends State<AuthCard> {
       setState(() {
         _authMode = AuthMode.Signup;
       });
+      _ctrlAnimation!.forward();
     } else {
       setState(() {
         _authMode = AuthMode.Login;
       });
+      _ctrlAnimation!.reverse();
     }
   }
 
@@ -213,12 +244,14 @@ class _AuthCardState extends State<AuthCard> {
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      child: Container(
-        height: _authMode == AuthMode.Signup ? 390 : 330,
-        constraints:
-            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
-        width: deviceSize.width * 0.75,
-        padding: EdgeInsets.all(16.0),
+      child: AnimatedBuilder(
+        animation: _heightAnimation!,
+        builder: (ctx, ch) => Container(
+          height: _heightAnimation!.value.height,
+          width: deviceSize.width * 0.75,
+          padding: EdgeInsets.all(16.0),
+          child: ch,
+        ),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -322,19 +355,8 @@ class _AuthCardState extends State<AuthCard> {
                         : null,
                   ),
                 ],
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Checkbox(
-                      value: _isSaveLogin,
-                      onChanged: (value) {
-                        setState(() {
-                          _isSaveLogin = value ?? false;
-                        });
-                      },
-                    ),
-                    Text('Save user data'),
-                  ],
+                SizedBox(
+                  height: medium,
                 ),
                 if (_isLoading)
                   CircularProgressIndicator()

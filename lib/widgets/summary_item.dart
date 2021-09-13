@@ -3,14 +3,14 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../constants.dart';
 
-import '../../models/expenses_item.dart';
+import '../models/expense.dart';
 import '../../providers/categories.dart';
 
 class SummaryItem extends StatelessWidget {
   final currency = NumberFormat("#,##0.00", "en_US");
   final DateTime date;
   final double total;
-  final List<ExpensesItem> expenses;
+  final List<Expense> expenses;
   SummaryItem(this.date, this.total, this.expenses, {Key? key})
       : super(key: key);
 
@@ -65,7 +65,7 @@ class SummaryItem extends StatelessWidget {
                         ),
                       ),
                       trailing: Text(
-                        'Rp ${currency.format(expense.amount!)}',
+                        'Rp ${currency.format(expense.amount)}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: large,

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 
-class ExpensesItem {
+class Expense {
   final String? id;
   final String? userId;
   final String? trxDate;
   final String? purpose;
-  final double? amount;
+  final double amount;
   final String? category;
   final DateTime? created;
   final DateTime? updated;
 
-  ExpensesItem({
+  Expense({
     @required this.id,
     @required this.userId,
     @required this.trxDate,
     @required this.purpose,
-    @required this.amount,
+    this.amount = 0.0,
     @required this.category,
     @required this.created,
     @required this.updated,

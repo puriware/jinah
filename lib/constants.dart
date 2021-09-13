@@ -15,4 +15,5 @@ final extraLarge = 32.0;
 final sllPrimaryColor = Color(0xFF0D9E86);
 
 const primaryColor = Color(0xFF1B7F89);
-const secondaryColor = Color(0xFF91E2D5);
+const primaryLightBackground = Color(0xFFD1E5E7);
+const secondaryColor = Color(0xFF5FA5AC);

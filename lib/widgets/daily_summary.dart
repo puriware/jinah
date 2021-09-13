@@ -25,23 +25,6 @@ class DailySummary extends StatelessWidget {
       elevation: 5,
       child: Column(
         children: [
-          // SizedBox(
-          //   height: medium,
-          // ),
-          // Text(
-          //   DateFormat('EEEE - dd MMMM yyyy').format(
-          //     DateTime.now(),
-          //   ),
-          //   style: TextStyle(
-          //     fontWeight: FontWeight.bold,
-          //     fontSize: 18,
-          //     color: Colors.grey,
-          //   ),
-          // ),
-          // Divider(
-          //   indent: large,
-          //   endIndent: large,
-          // ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
