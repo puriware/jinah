@@ -39,15 +39,16 @@ class _HistoryItemState extends State<HistoryItem> {
         borderRadius: BorderRadius.circular(large),
       ),
       margin: EdgeInsets.only(
-        left: 10,
-        top: 10,
-        right: 10,
+        left: large,
+        right: large,
+        bottom: 10,
       ),
       elevation: medium,
       child: Column(
         children: [
           ListTile(
             leading: CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primary,
               child: Text(
                 _expensesData.length.toString(),
               ),

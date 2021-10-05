@@ -34,9 +34,9 @@ class ExpensesGroupList extends StatelessWidget {
             child: Container(
               width: 120,
               decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).colorScheme.secondary,
                 border: Border.all(
-                  color: Theme.of(context).accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
                 borderRadius: BorderRadius.all(Radius.circular(20.0)),
               ),
@@ -50,8 +50,10 @@ class ExpensesGroupList extends StatelessWidget {
             ),
           ),
         ),
-        indexedItemBuilder: (ctx, expense, idx) =>
-            ExpensesItem(expense, expensesData.length - idx),
+        indexedItemBuilder: (ctx, expense, idx) => ExpensesItem(
+          expense,
+          expensesData.length - idx,
+        ),
       ),
     );
   }

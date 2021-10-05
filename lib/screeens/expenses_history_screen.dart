@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import "package:collection/collection.dart";
-import '../constants.dart';
 import '../models/expense.dart';
 import '../providers/expenses.dart';
 import '../widgets/history_item.dart';
@@ -13,7 +12,6 @@ class ExpensesHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(medium),
       child: Consumer<Expenses>(
         builder: (ctx, expensesData, child) {
           var newMap = groupBy(

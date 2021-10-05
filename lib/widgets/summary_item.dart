@@ -22,6 +22,7 @@ class SummaryItem extends StatelessWidget {
         children: [
           ListTile(
             leading: CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primary,
               child: FittedBox(
                 child: Text(
                   DateFormat('dd').format(this.date),
@@ -52,7 +53,7 @@ class SummaryItem extends StatelessWidget {
                       ),
                       subtitle: Text(expense.purpose.toString()),
                       leading: CircleAvatar(
-                        // Theme.of(context).accentColor,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         radius: 30,
                         child: Padding(
                           padding: EdgeInsets.all(2),

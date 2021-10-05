@@ -18,9 +18,10 @@ class UserProfile extends StatelessWidget {
       ),
       child: ListTile(
         leading: CircleAvatar(
-          child: userData.avatar != null
+          child: userData.avatar == null
               ? Icon(
                   Icons.person,
+                  color: Theme.of(context).colorScheme.primary,
                 )
               : ClipOval(
                   child: Image.network(
@@ -28,7 +29,7 @@ class UserProfile extends StatelessWidget {
                     fit: BoxFit.fill,
                   ),
                 ),
-          backgroundColor: Theme.of(context).accentColor,
+          backgroundColor: Theme.of(context).colorScheme.secondary,
         ),
         title: Text(
           '${userData.firstName.toString()} ${userData.lastName.toString()}',

@@ -73,9 +73,10 @@ class _ExpensesItemState extends State<ExpensesItem> {
         ),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted)
+        setState(() {
+          _isLoading = false;
+        });
     }
   }
 
@@ -98,7 +99,7 @@ class _ExpensesItemState extends State<ExpensesItem> {
             ),
             subtitle: Text(expense.purpose.toString()),
             leading: CircleAvatar(
-              // Theme.of(context).accentColor,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               radius: 30,
               child: Padding(
                 padding: EdgeInsets.all(2),
@@ -115,7 +116,9 @@ class _ExpensesItemState extends State<ExpensesItem> {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: large,
-                color: Colors.red,
+                color: expense.amount > 0
+                    ? Colors.red
+                    : Theme.of(context).colorScheme.secondary,
               ),
             ),
             onLongPress: () {

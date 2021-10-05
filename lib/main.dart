@@ -3,15 +3,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../providers/categories.dart';
-import '../../providers/user_active.dart';
-import '../../screeens/category_screen.dart';
-import '../constants.dart';
-import '../providers/auth.dart';
-import '../providers/expenses.dart';
-import '../screeens/auth_screen.dart';
-import '../screeens/home_screen.dart';
-import '../screeens/splash_screen.dart';
+import './screeens/auth_screen.dart';
+import './providers/categories.dart';
+import './providers/user_active.dart';
+import './screeens/category_screen.dart';
+import './constants.dart';
+import './providers/auth.dart';
+import './providers/expenses.dart';
+import './screeens/home_screen.dart';
+import './screeens/splash_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -53,11 +53,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
       ),
     );
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: Auth()),
@@ -92,8 +97,6 @@ class MyApp extends StatelessWidget {
           title: appTitle,
           theme: ThemeData(
             fontFamily: 'Lato',
-            primarySwatch: generateMaterialColor(primaryColor),
-            accentColor: Colors.amberAccent,
             scaffoldBackgroundColor: primaryLightBackground,
             appBarTheme: AppBarTheme.of(context).copyWith(
               centerTitle: true,
@@ -114,6 +117,9 @@ class MyApp extends StatelessWidget {
                 primary: primaryColor,
               ),
             ),
+            colorScheme: ColorScheme.fromSwatch(
+                    primarySwatch: generateMaterialColor(primaryColor))
+                .copyWith(secondary: Colors.amberAccent),
           ),
           home: auth.isAuth
               ? HomeScreen()

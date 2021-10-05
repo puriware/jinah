@@ -94,9 +94,10 @@ class UserScreen extends StatelessWidget {
                       'Logout',
                       'Are you sure you want to logout?',
                       'Logout',
-                      () {
+                      () async {
+                        await Provider.of<Auth>(context, listen: false)
+                            .logOut();
                         Navigator.of(context).pushReplacementNamed('/');
-                        Provider.of<Auth>(context, listen: false).logOut();
                       },
                     );
                   },

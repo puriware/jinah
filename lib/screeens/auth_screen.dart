@@ -1,127 +1,35 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/painting.dart';
 import '../../constants.dart';
-import '../models/http_exception.dart';
-import '../providers/auth.dart';
+import '../../providers/auth.dart';
+import '../../widgets/message_dialog.dart';
+import 'package:provider/provider.dart';
 
 enum AuthMode { Signup, Login }
 
-class AuthScreen extends StatelessWidget {
-  static const routeName = '/auth';
+class AuthScreen extends StatefulWidget {
+  AuthScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final deviceSize = MediaQuery.of(context).size;
-    // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
-    // transformConfig.translate(-10.0);
-    return Scaffold(
-      // resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  sllPrimaryColor,
-                  primaryColor,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                stops: [0, 1],
-              ),
-            ),
-          ),
-          Container(
-            height: deviceSize.height,
-            width: deviceSize.width,
-            padding: EdgeInsets.only(bottom: large),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: deviceSize.width * 0.5,
-                  child: Image.asset('assets/images/puriware-long-white.png'),
-                ),
-              ],
-            ),
-          ),
-          SingleChildScrollView(
-            child: Container(
-              height: deviceSize.height,
-              width: deviceSize.width,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  // Flexible(
-                  //   child: Container(
-                  //     margin: EdgeInsets.only(
-                  //       bottom: 20.0,
-                  //     ),
-                  //     padding: EdgeInsets.symmetric(
-                  //       vertical: 8.0,
-                  //       horizontal: 94.0,
-                  //     ),
-                  //     transform: Matrix4.rotationZ(-8 * pi / 180)
-                  //       ..translate(-10.0),
-                  //     // ..translate(-10.0),
-                  //     decoration: BoxDecoration(
-                  //       borderRadius: BorderRadius.circular(20),
-                  //       color: Colors.deepOrange.shade900,
-                  //       boxShadow: [
-                  //         BoxShadow(
-                  //           blurRadius: 8,
-                  //           color: Colors.black26,
-                  //           offset: Offset(0, 2),
-                  //         )
-                  //       ],
-                  //     ),
-                  //     child: Text(
-                  //       'Purishop',
-                  //       style: TextStyle(
-                  //         color: Theme.of(context).accentTextTheme.headline6!.color,
-                  //         fontSize: 50,
-                  //         fontFamily: 'Anton',
-                  //         fontWeight: FontWeight.normal,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  Flexible(
-                    flex: deviceSize.width > 600 ? 2 : 1,
-                    child: AuthCard(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  _AuthScreenState createState() => _AuthScreenState();
 }
 
-class AuthCard extends StatefulWidget {
-  const AuthCard({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  _AuthCardState createState() => _AuthCardState();
-}
-
-class _AuthCardState extends State<AuthCard>
+class _AuthScreenState extends State<AuthScreen>
     with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey();
-  AuthMode _authMode = AuthMode.Login;
   Map<String, String> _authData = {
     'email': '',
     'password': '',
+    'firstname': '',
+    'lastname': '',
+    'limit': '0',
   };
+  AuthMode _authMode = AuthMode.Login;
   var _isLoading = false;
   final _passwordController = TextEditingController();
   var _passwordVisible = false;
+
   AnimationController? _ctrlAnimation;
   Animation<Size>? _heightAnimation;
 
@@ -131,19 +39,19 @@ class _AuthCardState extends State<AuthCard>
     _ctrlAnimation = AnimationController(
       vsync: this,
       duration: Duration(
-        milliseconds: 700,
+        milliseconds: 500,
       ),
       reverseDuration: Duration(
         milliseconds: 500,
       ),
     );
     _heightAnimation = Tween<Size>(
-      begin: Size(double.infinity, 290),
-      end: Size(double.infinity, 350),
+      begin: Size(double.infinity, 140),
+      end: Size(double.infinity, 360),
     ).animate(
       CurvedAnimation(
         parent: _ctrlAnimation!,
-        curve: Curves.fastOutSlowIn,
+        curve: Curves.easeInOut, //.fastOutSlowIn,
       ),
     );
   }
@@ -152,24 +60,6 @@ class _AuthCardState extends State<AuthCard>
   void dispose() {
     super.dispose();
     if (_ctrlAnimation != null) _ctrlAnimation!.dispose();
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('An error Occurred!'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: Text('Close'),
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> _submit() async {
@@ -181,44 +71,33 @@ class _AuthCardState extends State<AuthCard>
     setState(() {
       _isLoading = true;
     });
+    // Log user in
     try {
       if (_authMode == AuthMode.Login) {
-        // Log user in
         await Provider.of<Auth>(context, listen: false).signIn(
-          _authData['email'].toString(),
-          _authData['password'].toString(),
+          _authData['email']!,
+          _authData['password']!,
         );
       } else {
-        // Sign user up
         await Provider.of<Auth>(context, listen: false).signUp(
-          _authData['email'].toString(),
-          _authData['password'].toString(),
+          _authData['email']!,
+          _authData['password']!,
+          _authData['firstname']!,
+          _authData['lastname']!,
+          _authData['limit']!,
         );
       }
-    } on HttpException catch (error) {
-      var errorMessage = 'Authentication failed.';
-      if (error.toString().contains('EMAIL_EXISTS')) {
-        errorMessage = 'Email address is already in use.';
-      } else if (error.toString().contains('INVALID_EMAIL')) {
-        errorMessage = 'Email address is not valid.';
-      } else if (error.toString().contains('WEAK_PASSWORD')) {
-        errorMessage = 'Password is too weak.';
-      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
-        errorMessage = 'Could not found a user with that email address.';
-      } else if (error.toString().contains('INVALID_PASSWORD')) {
-        errorMessage = 'Invalid password';
-      }
-      setState(() {
-        _isLoading = false;
-      });
-      _showErrorDialog(errorMessage);
     } catch (error) {
-      setState(() {
-        _isLoading = false;
-      });
-      const errorMessage =
-          'Could not authenticate you. Please try again later.';
-      _showErrorDialog(errorMessage);
+      MessageDialog.showPopUpMessage(
+        context,
+        '${_authMode == AuthMode.Login ? 'Login' : 'Sign Up'} Error',
+        error.toString(),
+      );
+    } finally {
+      if (mounted)
+        setState(() {
+          _isLoading = false;
+        });
     }
   }
 
@@ -238,157 +117,368 @@ class _AuthCardState extends State<AuthCard>
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = MediaQuery.of(context).size;
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      elevation: 8.0,
-      child: AnimatedBuilder(
-        animation: _heightAnimation!,
-        builder: (ctx, ch) => Container(
-          height: _heightAnimation!.value.height,
-          width: deviceSize.width * 0.75,
-          padding: EdgeInsets.all(16.0),
-          child: ch,
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              primaryColor,
+              sllPrimaryColor,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: [0, 1],
+          ),
         ),
-        child: Form(
-          key: _formKey,
+        height: double.infinity,
+        padding: EdgeInsets.all(32),
+        child: Center(
           child: SingleChildScrollView(
             child: Column(
-              children: <Widget>[
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.fastOutSlowIn,
+                  height: _authMode == AuthMode.Login ? 150 : 0,
+                  width: 150,
+                  child: Image.asset('assets/images/white_logo.png'),
+                ),
+                SizedBox(height: large),
                 Text(
-                  'Welcome to Jinah',
+                  _authMode == AuthMode.Login ? 'Welcome Back!' : 'Register',
                   style: Theme.of(context).textTheme.headline6,
+                ),
+                if (_authMode == AuthMode.Login) ...[
+                  SizedBox(
+                    height: medium,
+                  ),
+                  Text(
+                    'Login to your Jinah account',
+                  ),
+                ],
+                SizedBox(height: 32),
+                AnimatedBuilder(
+                  animation: _heightAnimation!,
+                  builder: (ctx, ch) => Container(
+                    height: _heightAnimation!.value.height,
+                    child: ch,
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            decoration: InputDecoration(
+                              //labelText: 'E-Mail',
+                              border: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  const Radius.circular(90),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  const Radius.circular(90),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                              fillColor: Colors.white70,
+                              filled: true,
+                              prefixIcon: Icon(
+                                Icons.alternate_email_rounded,
+                              ),
+                              hintText: 'E-mail Address',
+                            ),
+                            textInputAction: TextInputAction.next,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value.length < 3 ||
+                                  !value.contains('@')) {
+                                return 'Please enter your valid e-mail address';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _authData['email'] = value!;
+                            },
+                          ),
+                          SizedBox(
+                            height: large,
+                          ),
+                          if (_authMode == AuthMode.Signup) ...[
+                            TextFormField(
+                              decoration: InputDecoration(
+                                //labelText: 'E-Mail',
+                                border: OutlineInputBorder(
+                                  borderRadius: const BorderRadius.all(
+                                    const Radius.circular(90),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: const BorderRadius.all(
+                                    const Radius.circular(90),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                                fillColor: Colors.white70,
+                                filled: true,
+                                prefixIcon: Icon(
+                                  Icons.person_add_rounded,
+                                ),
+                                hintText: 'First Name',
+                              ),
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.name,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your first name';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _authData['firstname'] = value!;
+                              },
+                            ),
+                            SizedBox(
+                              height: large,
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                //labelText: 'E-Mail',
+                                border: OutlineInputBorder(
+                                  borderRadius: const BorderRadius.all(
+                                    const Radius.circular(90),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: const BorderRadius.all(
+                                    const Radius.circular(90),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                                fillColor: Colors.white70,
+                                filled: true,
+                                prefixIcon: Icon(
+                                  Icons.person_add_alt_1_rounded,
+                                ),
+                                hintText: 'Last Name',
+                              ),
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.name,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your last name';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _authData['lastname'] = value!;
+                              },
+                            ),
+                            SizedBox(
+                              height: large,
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                //labelText: 'E-Mail',
+                                border: OutlineInputBorder(
+                                  borderRadius: const BorderRadius.all(
+                                    const Radius.circular(90),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: const BorderRadius.all(
+                                    const Radius.circular(90),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                                fillColor: Colors.white70,
+                                filled: true,
+                                prefixIcon: Icon(
+                                  Icons.money_rounded,
+                                ),
+                                hintText: 'Monthly Limit',
+                              ),
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your limit number';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _authData['limit'] = value!;
+                              },
+                            ),
+                            SizedBox(
+                              height: large,
+                            ),
+                          ],
+                          TextFormField(
+                            decoration: InputDecoration(
+                              //labelText: 'Password',
+                              border: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  const Radius.circular(90),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  const Radius.circular(90),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                              fillColor: Colors.white70,
+                              filled: true,
+                              prefixIcon: Icon(Icons.lock_rounded),
+                              suffixIcon: IconButton(
+                                padding: EdgeInsets.only(right: large),
+                                icon: Icon(
+                                  _passwordVisible
+                                      ? Icons.visibility_off_rounded
+                                      : Icons.visibility_rounded,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _passwordVisible = !_passwordVisible;
+                                  });
+                                },
+                              ),
+                              hintText: 'Password',
+                            ),
+                            obscureText: !_passwordVisible,
+                            controller: _passwordController,
+                            textInputAction: TextInputAction.done,
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value.length < 5) {
+                                return 'Password is too short!';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _authData['password'] = value!;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
                 SizedBox(
                   height: large,
                 ),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'E-Mail',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(
-                      Icons.alternate_email_rounded,
-                    ),
-                    hintText: 'Enter your email address',
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null ||
-                        value.isEmpty ||
-                        !value.contains('@')) {
-                      return 'Invalid email!';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _authData['email'] = value.toString();
-                  },
-                ),
-                SizedBox(
-                  height: medium,
-                ),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock_rounded),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _passwordVisible
-                            ? Icons.visibility_off_rounded
-                            : Icons.visibility_rounded,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _passwordVisible = !_passwordVisible;
-                        });
-                      },
-                    ),
-                    hintText: 'Enter password',
-                  ),
-                  obscureText: !_passwordVisible,
-                  controller: _passwordController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty || value.length < 5) {
-                      return 'Password is too short!';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _authData['password'] = value.toString();
-                  },
-                ),
-                if (_authMode == AuthMode.Signup) ...[
-                  SizedBox(
-                    height: medium,
-                  ),
-                  TextFormField(
-                    enabled: _authMode == AuthMode.Signup,
-                    decoration: InputDecoration(
-                      labelText: 'Confirm Password',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.lock_rounded),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _passwordVisible
-                              ? Icons.visibility_off_rounded
-                              : Icons.visibility_rounded,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _passwordVisible = !_passwordVisible;
-                          });
-                        },
-                      ),
-                      hintText: 'Re-enter password',
-                    ),
-                    obscureText: !_passwordVisible,
-                    validator: _authMode == AuthMode.Signup
-                        ? (value) {
-                            if (value != _passwordController.text) {
-                              return 'Passwords do not match!';
-                            }
-                            return null;
-                          }
-                        : null,
-                  ),
-                ],
-                SizedBox(
-                  height: medium,
-                ),
+                // AnimatedContainer(
+                //   duration: const Duration(milliseconds: 500),
+                //   curve: Curves.fastOutSlowIn,
+                //   width: double.infinity,
+                //   height: _authMode == AuthMode.Login ? 20 : 0,
+                //   child: InkWell(
+                //     child: Text(
+                //       'Forgot password?',
+                //       textAlign: TextAlign.end,
+                //       style: TextStyle(
+                //         color: primaryDarkerColor,
+                //       ),
+                //     ),
+                //     onTap: () {},
+                //   ),
+                // ),
+                // SizedBox(
+                //   height: medium,
+                // ),
                 if (_isLoading)
-                  CircularProgressIndicator()
+                  CircularProgressIndicator(
+                    color: primaryColor,
+                  )
                 else
-                  ElevatedButton(
-                    child:
-                        Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP'),
-                    onPressed: _submit,
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                  Container(
+                    height: 48,
+                    width: 128,
+                    child: TextButton(
+                      child: Text(
+                        _authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP',
                       ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
-                      primary: Theme.of(context).primaryColor,
-                      textStyle: TextStyle(
-                        color: Theme.of(context).primaryTextTheme.button!.color,
+                      onPressed: _submit,
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 30.0, vertical: 8.0),
+                        backgroundColor:
+                            primaryColor, // Theme.of(context).primaryColor,
+                        primary: primaryLightBackground,
                       ),
                     ),
                   ),
-                TextButton(
-                  child: Text(
-                      '${_authMode == AuthMode.Login ? 'SIGNUP' : 'LOGIN'} INSTEAD'),
-                  onPressed: _switchAuthMode,
-                  style: TextButton.styleFrom(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    textStyle: TextStyle(
-                      color: Theme.of(context).primaryColor,
+                SizedBox(
+                  height: 32,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _authMode == AuthMode.Login
+                          ? 'Don\'t have an account? '
+                          : 'Already have an account?',
                     ),
-                  ),
+                    TextButton(
+                      child: Text(
+                        _authMode == AuthMode.Login ? 'Sign Up' : 'Login',
+                      ),
+                      onPressed: _switchAuthMode,
+                      style: ButtonStyle(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        foregroundColor: MaterialStateProperty.all<Color>(
+                          primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: large,
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.fastOutSlowIn,
+                  height: _authMode == AuthMode.Login ? 50 : 0,
+                  width: 200,
+                  child: Image.asset('assets/images/puriware-long-white.png'),
                 ),
               ],
             ),

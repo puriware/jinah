@@ -52,13 +52,11 @@ class Expenses with ChangeNotifier {
   }
 
   List<Expense> get thisMonth {
-    return _items
-        .where(
-          (item) =>
-              DateTime.parse(item.trxDate.toString()).month ==
-              DateTime.now().month,
-        )
-        .toList();
+    final now = DateTime.now();
+    return _items.where((item) {
+      final date = DateTime.parse(item.trxDate.toString());
+      return date.year == now.year && date.month == now.month;
+    }).toList();
   }
 
   List<Expense> get thisWeekExpenses {
@@ -67,7 +65,7 @@ class Expenses with ChangeNotifier {
     final weekday = today.weekday;
     final startWeek = today.add(
       Duration(
-        days: -weekday,
+        days: -(weekday - 1),
       ),
     );
 
@@ -86,8 +84,8 @@ class Expenses with ChangeNotifier {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final weekday = today.weekday;
-    final startWeek = today.add(Duration(days: -(7 + weekday)));
-    final endWeek = today.add(Duration(days: -weekday));
+    final startWeek = today.add(Duration(days: -(6 + weekday)));
+    final endWeek = today.add(Duration(days: -weekday + 1));
     return [
       ..._items
           .where(
@@ -107,6 +105,7 @@ class Expenses with ChangeNotifier {
   }
 
   double get thisMonthTotalExpenses {
+    print(thisMonth);
     final amountList = thisMonth.map((e) => e.amount);
     var total = amountList.reduce((value, element) => value + element);
     return total;
